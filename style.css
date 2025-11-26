@@ -1,0 +1,72 @@
+h2 {
+  font-family: "Lucida Console";
+}
+body {
+    font-family: "arial";
+    min-width: fit-content;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.controls {
+  display: flex;
+  border-bottom-width: 1px;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.controls .item {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  color: gray
+}
+
+.controls label {
+  font-weight: bold;
+  margin: 0;
+  padding-right: 0.5rem;
+  color: gray;
+  font-size: 0.95em;
+}
+
+.controls select {
+  padding: 0.5rem;
+  border: 1px solid oklch(80% 3% 200);
+  border-radius: 0.25rem;
+  background: var(--bg, white);
+  color: gray;
+  min-width: 10rem;
+}
+
+.controls button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.linePlotDisplay {
+    display: grid;
+    grid-template-columns: auto max-content;
+    align-items: start;
+    gap: 30px;   /* increase spacing for clarity */
+    width: max-content;
+}
+
+.linePlotDisplay #viz{
+  grid-column: 1;
+  grid-row: auto;
+}
+
+.linePlotDisplay #legend{
+  grid-column: 2;
+  grid-row: auto;
+  /* margin-left: 30px;
+  margin-top: 120px; */
+}
