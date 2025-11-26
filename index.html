@@ -1,34 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
+    <title>AI Driven - Antarctic Heatmap</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Line Graph</title>
     <script type="module" src="main.js"></script>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Greeness Over the Years in U.S.</h1>
-    <div class="controls">
-      <div class="item"><label for="startYear" >Start Year:</label></div>
-      <div class="item"><select id="startYear"></select></div>
-      <div class="item"><label for="endYear">End Year:</label></div>
-      <div class="item"><select id="endYear"></select></div>
-      <div class="item"><button id="updateButton">Update Line PLot</button></div>
-    </div>
-    <br>
-    <div class="linePlotDisplay">
-      <div id="viz"></div>
-      <div id="legend"></div>
-    </div>
+    <script type="module" src="main.js"></script>
+  </head>
 
-<<<<<<< HEAD
-=======
   <body>
     <header>
       <h1>
-        <small>Project 3</small>
-        Snow Coverage Change in Antarctica During 1st Year of COVID
+        Circle of Life: Vegetation in the U.S. in 20 years
       </h1>
 
       <p><strong>Tony Bai</strong> — <em>zhbai@ucsd.edu</em></p>
@@ -39,110 +24,55 @@
     <main>
 
         <section id="final-viz">
-          <h2 id="heatmapTitle">Change in Snow Coverage by Antarctica between March 2020 to February 2021</h2>
-  
-          <div class="controls">
-          <div class="item"><label for="startMonth" >Start Month:</label></div>
-          <div class="item"><select id="startMonth"></select></div>
-          <div class="item"><label for="endMonth">End Month:</label></div>
-          <div class="item"><select id="endMonth"></select></div>
-          <div class="item"><button id="updateButton">Update Heatmap</button></div>
-          </div>
-          <br>
-          <div class="heatmapDisplay">
-          <div id="viz"></div>
-          <div id="legend"></div>
-          </div>
-  
-          <div id="brushStats">No region selected</div>
+            <h2>Greeness Over the Years in U.S.</h2>
+            <div class="controls">
+                <div class="item"><label for="startYear" >Start Year:</label></div>
+                <div class="item"><select id="startYear"></select></div>
+                <div class="item"><label for="endYear">End Year:</label></div>
+                <div class="item"><select id="endYear"></select></div>
+                <div class="item"><button id="updateButton">Update Line PLot</button></div>
+              </div>
+              <br>
+              <div class="linePlotDisplay">
+                <div id="viz"></div>
+                <div id="legend"></div>
+              </div>
 
           <figure>
-            <figcaption>Select any two months, provided the second months chronologically occurs after the first. You can drag-to-select to focus on a specific region.</figcaption>
+            <figcaption>
+              Select any two years such that the range between them is 5 years. Each colored line corresponds to a year, showing the trend of vegetation over the year in the U.S. overall. The x-axis represents the months, and the y-axis represents the density of current vegetation over the U.S.
+            </figcaption>
           </figure>
         </section>
       
 
       <section>
 
-        <h2>Design Decisions and Rationale</h2>
+        <h2>What have we done so far?</h2>
+        <ol>
+          <li>We chose NASA MODIS as our dataset and have finished most of our EDA.</li>
+          <li>We have compiled the data we are planning to use into .csv files, pulled from the .xml file acquired from the dataset.</li>
+          <li>We have started working on creating appropriate sized bins of vegetation density for the final visualization on a map and ways to plot it.</li>
+          <li>We are working on making our final presentation a more 'story-telling' format, experimenting with multiple map visualizations, etc.</li>
+        </ol>
 
-       <p>
-        We chose the NASA MODIS Satellite Imagery as our dataset. It is quite well established that carbon emissions had greatly reduced the pandemic. We wanted to look at how this affected the ice caps. We looked at Antarctica for this, looking at the snow coverage in the region during the first year of the pandemic.
-       </p>
-
-       <div class="img-wrap-box">
-          <img class="img-wrap" src="images/scatter 500.png" alt="Scatter plot of NDSI against radial distance from center." />
-
-        <p>
-          We first tried to plot a scatter plot of the NDSI of a region against the radial distance of the region from the center of Antarctica. We declared regions in rings from the center, declaring new rings at fixed intervals. We did not like the way it looked and felt it did not convey enough on a month-to-month or week-to-week basis when making it interactive.
-        </p>
-      </div>
-
-      <div class="img-wrap-box">
-        <img class="img-wrap" src="images/hist.png" alt="A histogram showing the percentage of snow coverage in Antarctica." />
-
-        <p>
-          We then plotted a histogram showing the distribution of snow coverage by percentage in Antarctica. Again, we felt this plot did not convey enough information to be interesting. 
-        </p>
-       </div>
-
-       <div class="img-wrap-box">
-        <img class="img-wrap" src="images/terra.png" alt="a color-coded map of Antarctica, where each color shows a bin in which ranges of NDSI have been classified." />
-
-        <p>
-          We then finally plotted a color-coded snow coverage map of Antarctica, with the colors showing degrees of snow coverage over the continent. 
-        </p>
-      </div>
-
-      <div style="margin: 1em 0; clear:left"></div>
       </section>
 
       <section>
-        <h2>Working on the final prototype</h2>
 
-        <p>Since the focus of the class is climate this year, we felt the last visualization was the most appropriate for the final presentation, not to mention it also had the potential to provide the most relevant information, especially when made interactive. Once we had chosen this as our final visualization, we explored some related plots to see what we could do.</p>
+        <h2>What will be the most challenging of your project to design and why?</h2>
+        <ol>
+          <li>As of right now, we believe the most challenging part to design would be a good story-telling format.</li>
+          <li>While we are currently experimenting on ways to do this, but since there are so many options, it is tough to decide on a final one.</li>
+          <li>So far, we have experimented with just one map combined with a line plot, only a map, a slideshow format like the gun deaths story-telling visualization covered in lecture, and even multiple maps for each year, each map showing the vegetation for each season.</li>
+          <li>For the visualization where we would show multiple maps for each season, experimenting with the number of bins gets tougher, since we want to show differences but not make them too exaggerated.</li>
+          <li>For the other visualizations, coming up with an 'and-therfore' is okay, but coming up with a 'but' part of the story is somewhat difficult.</li>
+          <li>Also, while for now, we are only showing five years, we might look into methods that can show more than 5 years yet still not be cluttered.</li>
+        </ol>
 
-        <div class="img-wrap-box">
-          <img class="img-wrap" src="images/heatmap.png" alt="a heat map showing the percentage difference of NDSI change of each box per month. The changes are binned in increments of 20% and then color coded." />
-          <p>Since we wanted to see how the snow coverage was changing during the first year of the pandemic, we decided instead of plotting the snow coverage itself, we could plot the difference of it per month to make it clearer to the viewer. A slider at the bottom let you choose the day of the year, since we are only looking at the first year of the pandemic. The idea was good, but with the current box sizes, it was not very informative.</p>
-        </div>
-        <p>Since we had chosen the map visualization, we realized we could overlay a 'heat map' on top of the actual map of Antarctica. We added the day slider to the visualization. However, we now noticed how loading times were too long. This map generated was 512x512 pixels, which is quite large to load for an interactive visualization, since each time the slider was updated, the visualization would be completely re-rendered.</p>
-        <p>We hence decided to downscale the image to 128x128. Collecting data for by requesting the heat map API data for each month, we grouped 4x4 squares and took the average to get one pixel. This is how we obtained our .csv file.</p>
-      </section>
-
-      <section>
-        <h2>The <a href="#final-viz">Final Visualization</a></h2>
-        <p>For the heatmap, we chose a diverging and discretized color scale to clearly indicating associated levels of loss and decrease of snow coverage. We chose bluer colors to represent more snow (implying more cold), and redder colors to represent less snow (implying more heat). We chose to encode all pixels with 0 change in NDSI for 12 continuous months as white to represent the sea, as to not confuse with the heatmap. We also chose to label well known landmarks to better identify potential relevance to the change in NDSI. We also incorporated the brush tool to further help users look at specific locations on the map. A tooltip at the bottom helps viewers still view the full map when selecting a particular region.</p>
-        <p>Users can choose any two months, provided the first month is before the second one, and observe the temporal and spatial changes. The day slider would require too much memory in cache, which may cause the webpage to crash. The brush enables users to select regions of interest and see statistics (percentage of Antarctica, count of cells by color, and associated change categories). This implements details-on-demand, helping users explore the spatial distribution of change. </p>
-        <p>We considered a continous color-scale for the heatmap. However, it is often visually challenging for viewers to discern the degree of change and corresponding value. In terms of interaction, we considered zooming, but providing statistics via brush tool is not only less cluttering but also informative in comparison to an enlarged version. We also considered an animated temporal change, but the precise control requires additional buttons and controls to complete. Commonly, users are interested in the comparison of two months, so dropdown filters are sufficient for that purpose.</p>
-      </section>
-
-      <section>
-        <h2>Time-consumption</h2>
-        <p>Before the checkpoint, just exploring all ideas took the most amount of time, since we debated on how good the visualization would be for interactivity. Interactivity allows us to present less at a time but more overall, and it was somewhat challenging making sure our visualization could not be presented in a static format, even if that would appear cluttered.</p>
-        <p>After the checkpoint, since we were working on refining our visualization and optimizing it (such as making loading times quicker by reducing image size, deciding on color encodings that were clear, etc.), the optimizations and making it look good took the most amount of time.</p>
-      </section>
-
-      <section>
-        <h2>Contributions</h2>
-        <p>Tony: 
-          <ul>Plotted the initial heat map and bar graph for checkpoint;</ul>
-          <ul>Compiled the heat map image from the NASA API into data and then into a .csv file to be used for visualization.</ul></p>
-          
-        <p>Ricky:
-          <ul>Created the heat map for the website.</ul>
-          <ul>Wrote the style.css and main.js for the visualization.</ul></p>
-
-        <p>Dhruv:
-          <ul>Co-created the heat map.</ul>
-          <ul>Wrote the writeup and compiled it with the visualization .html file.</ul>
-        </p>
-
-        <p><em>Total people hours: 25-30 hours (~8-10 hours per person)<em></em></p>
       </section>
 
     </main>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c822b88e119346678db149ed7b7721c9","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
->>>>>>> 4169ebf1599bd55274d8ad192a1432799acb0ced
 </body>
 </html>
