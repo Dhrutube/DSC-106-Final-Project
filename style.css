@@ -101,7 +101,7 @@ body {
     width: 70%;       
     flex-grow: 1;       
     gap: 10px;          
-    max-height: 80%;
+    max-height: 70%;
     overflow-y: auto;
 
     img {
