@@ -290,12 +290,13 @@ function renderLinePlot(data) {
             .y(d => y(d.density))
         );
     svgLine.append("text")
-    .attr("x", lineWidth / 2)
-    .attr("y", -lineMargin.top / 2 + 10) // above the plot
-    .attr("text-anchor", "middle")
-    .attr("font-size", "18px")
-    .attr("font-weight", "bold")
-    .text("Vegetation Density Declines Sharply");
+        .attr("x", lineWidth / 2)
+        .attr("y", -lineMargin.top / 2 + 10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .attr("font-weight", "bold")
+        .attr("fill", "white") 
+        .text("Vegetation Density Declines Sharply");
 }
 
 // Init
