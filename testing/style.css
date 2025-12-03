@@ -1,13 +1,10 @@
 body {
   margin: 0;
+  padding: 0;
   overflow: hidden;
   font-family: Arial, sans-serif;
   background: #212121;
   color: #e5e5e5;
-}
-
-h1 {
-  font-size: 45px;
 }
 
 #slider-container {
@@ -23,16 +20,30 @@ h1 {
   top: 0;
   left: 0;
 
-  /* Centering */
-  display: block;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding-top: 18%;
-
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
+}
+
+.page:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical center */
+  align-items: center;       /* horizontal center */
+  text-align: center;        /* center text */
+  padding: 0;                /* remove top padding */
+
+  h1 {
+    font-size: 45px;
+  }
+}
+
+.page:not(:first-child) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* center horizontally */
+  text-align: center;    /* center text */
+  padding-top: 10px;
 }
 
 .page.active {
