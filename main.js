@@ -141,16 +141,17 @@ function drawLegendVertical(colors) {
 
     // Descriptions for each color
     const labels = [
-        "Large decrease",
-        "Small decrease",
-        "No change",
-        "Small increase",
-        "Large increase"
+        "<= -1.5 (Large decrease)",       // everything below -1.5
+        "-1.5 to -0.5 (Small decrease)",  // -1.5 < value <= -0.5
+        "-0.5 to 0.5 (No change)",        // -0.5 < value <= 0.5
+        "0.5 to 1.5 (Small increase)",    // 0.5 < value <= 1.5
+        "> 1.5 (Large increase)"          // everything above 1.5
     ];
+
 
     const legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", `translate(${width - rectWidth - padding- 100}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
+        .attr("transform", `translate(${width - rectWidth - padding- 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
 
     // Draw colored rectangles
     legend.selectAll("rect")
@@ -216,15 +217,8 @@ function drawHeatmap(data, startYear, endYear) {
     // Filter out missing values for scale
     const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
-    // Dynamic thresholds based on quantiles of differences
-    const thresholds = [
-        d3.quantile(validDiffs, 0.20),
-        d3.quantile(validDiffs, 0.40),
-        d3.quantile(validDiffs, 0.60),
-        d3.quantile(validDiffs, 0.80)
-    ];
-
-    const colors = ["#d73027","#fc8d59","#0a0a07","#91bfdb","#4575b4"];
+    const thresholds = [-1.5, -0.5, 0, 0.5, 1.5];
+    const colors = ["#4575b4","#91bfdb","#f0f0f0","#fc8d59","#d73027"];
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
