@@ -28,10 +28,10 @@ body {
 .page:first-child {
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* vertical center */
-  align-items: center;       /* horizontal center */
-  text-align: center;        /* center text */
-  padding: 0;                /* remove top padding */
+  justify-content: center;  
+  align-items: center;      
+  text-align: center;      
+  padding: 0;             
 
   h1 {
     font-size: 45px;
@@ -41,13 +41,13 @@ body {
 .page:not(:first-child) {
   display: flex;
   flex-direction: column;
-  align-items: center;   /* center horizontally */
-  text-align: center;    /* center text */
+  align-items: center;  
+  text-align: center;  
   padding-top: 10px;
-  height: 100%; /* let page fill container */
+  height: 100%; 
 
   h1 {
-    margin-bottom: 0; /* space below heading */
+    margin-bottom: 0;
   }
 }
 
@@ -94,14 +94,13 @@ body {
   visibility: hidden;
 }
 
-/* Quadrant container fills remaining space under heading */
 .quadrants-scroll {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    width: 70%;          /* optional margin from sides */
-    flex-grow: 1;         /* fills remaining vertical space */
-    gap: 10px;           /* spacing between images */
+    width: 70%;       
+    flex-grow: 1;       
+    gap: 10px;          
     max-height: 80%;
     overflow-y: auto;
 
