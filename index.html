@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="main.js"></script>
   </head>
   <body>
     <div id="slider-container">
@@ -29,19 +30,35 @@
       <div class="page">
         <h1>In a perfect world, the vegetation density would stay relatively stable for every year...</h1>
         <h2>...but because of climate change vegetation density has changed throughout the years</h1>
-        <!--put the heatmap plot here-->
+          
+          <!-- Newly added -->
+          <div class="controls">
+            <div class="item"><label for="startYear" >Start Year:</label></div>
+            <div class="item"><select id="startYear"></select></div>
+            <div class="item"><label for="endYear">End Year:</label></div>
+            <div class="item"><select id="endYear"></select></div>
+            <div class="item"><button id="updateButton">Update Heatmap</button></div>
+          </div>
+          <div class="heatmapDisplay">
+            <div id="viz">
+              <div id="instruction">Select start and end years, then click "Update Heatmap" to see the changes in vegetation density over time.</div>
+            </div>
+            <div id="legend"></div>
+          </div>
+
       </div>
 
       <div class="page">
         <h1>During the summer months, the vegetation density has been volatile</h1>
         <h2>because of droughts and elevated levels of CO2</h2>
-        <!--put the line plot here-->
+        <div class="linePlotDisplay">
+          <div id="lineViz"></div>
+        </div>
       </div>
     </div>
 
     <!-- Arrows -->
     <div id="left-arrow">&#10094;</div>
     <div id="right-arrow">&#10095;</div>
-  <script src="main.js"></script>
   </body>
 </html>
