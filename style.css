@@ -44,6 +44,11 @@ body {
   align-items: center;   /* center horizontally */
   text-align: center;    /* center text */
   padding-top: 10px;
+  height: 100%; /* let page fill container */
+
+  h1 {
+    margin-bottom: 20px; /* space below heading */
+  }
 }
 
 .page.active {
@@ -87,4 +92,28 @@ body {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+/* Quadrant container fills remaining space under heading */
+.quadrants-scroll {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 70%;          /* optional margin from sides */
+    flex-grow: 1;         /* fills remaining vertical space */
+    gap: 10px;           /* spacing between images */
+    max-height: 80%;
+    overflow-y: auto;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: flex;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    img.fade-in {
+      opacity: 1;
+    }
 }
