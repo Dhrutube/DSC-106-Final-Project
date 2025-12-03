@@ -27,11 +27,14 @@ body {
 }
 
 .page:first-child {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
+  justify-content: center !important;
+  align-items: center !important;
   text-align: center;
-  padding: 20px;
-  align-items: center;            
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden;       
 
   h1 {
     font-size: 45px;
