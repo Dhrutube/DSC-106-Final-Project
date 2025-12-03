@@ -1,4 +1,124 @@
 body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #212121;
+  color: #e5e5e5;
+}
+
+#slider-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.page:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  
+  align-items: center;      
+  text-align: center;      
+  padding: 0;             
+
+  h1 {
+    font-size: 45px;
+  }
+}
+
+.page:not(:first-child) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;  
+  padding-top: 10px;
+  height: 100%; 
+
+  h1 {
+    margin-bottom: 0;
+  }
+}
+
+.page.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Wipe overlay */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.5s ease-in-out;
+  pointer-events: none;
+}
+
+/* Trigger wipe-out animation */
+.page.wipe-out::after {
+  clip-path: inset(0 0 0 0); 
+}
+
+/* Arrows */
+#left-arrow, #right-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  cursor: pointer;
+  color: #444;
+  padding: 10px;
+  user-select: none;
+  z-index: 1000;
+}
+#left-arrow { left: 20px; }
+#right-arrow { right: 20px; }
+#left-arrow:hover, #right-arrow:hover { color: black; }
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.quadrants-scroll {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 70%;       
+    flex-grow: 1;       
+    gap: 10px;          
+    max-height: 70%;
+    overflow-y: auto;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: flex;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    img.fade-in {
+      opacity: 1;
+    }
+}
+
+/* =========== Ricky's CSS*/
+body {
   font: 100%/1.5 system-ui;
   max-width: 140ch;
   margin-inline: auto;
@@ -17,17 +137,20 @@ body {
 
 .controls .item {
   display: flex;
-  align-items: center;
-  white-space: nowrap;
-  color: gray
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;  
+  padding-top: 10px;
+  height: 100%; 
+
+  h1 {
+    margin-bottom: 0;
+  }
 }
 
-.controls label {
-  font-weight: bold;
-  margin: 0;
-  padding-right: 0.5rem;
-  color: gray;
-  font-size: 0.95em;
+.page.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .controls select {

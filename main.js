@@ -46,13 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             img.classList.add("fade-in");
                         }, i * 1000);
                     })
-                } else {
-                    // Remove fade-in class from images on other pages
-                    const allImages = next.querySelectorAll(".quadrants-scroll img");
-                    allImages.forEach(img => img.classList.remove("fade-in"));
-                }
+                }     
             }, 200);
         }, 500); // tiny delay ensures transition is applied properly
+        const images = next.querySelectorAll(".quadrants-scroll img");
+        images.forEach((img) => img.classList.remove("fade-in"));
     }
 
     document.getElementById("right-arrow").onclick = () => {
