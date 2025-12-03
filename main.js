@@ -289,6 +289,7 @@ function renderLinePlot(data) {
     .attr("text-anchor", "middle")
     .attr("font-size", "18px")
     .attr("font-weight", "bold")
+    .attr("fill", "white") 
     .text("Vegetation Density Declines Sharply");
 }
 
