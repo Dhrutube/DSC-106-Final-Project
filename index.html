@@ -1,79 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>AI Driven - Antarctic Heatmap</title>
+    <title>A Peek Into Vegetation Health and Climate Change</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Line Graph</title>
-    <script type="module" src="main.js"></script>
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="main.js"></script>
   </head>
-
   <body>
-    <header>
-      <h1>
-        Circle of Life: Vegetation in the U.S. in 20 years
-      </h1>
+    <div id="slider-container">
+      <div class="page active">
+        <h1>Vegetation Density is a Sign of Climate Change</h1>
+        <h2>Plants reacts to climate change before us humans do. <br>
+          Effects of climate change---changes in rainfall, temperature, and CO2 levels---affect plants <br> 
+          much faster than other signs of climate change we are looking at. <br> 
+          Unlike ocean levels or melting glaciers that take years or decades to see changes, <br>
+          changes in vegetation density can be seen within a single year.
+        </h2>
+      </div>
 
-      <p><strong>Tony Bai</strong> — <em>zhbai@ucsd.edu</em></p>
-      <p><strong>Ricky Zhang</strong> — <em>riz004@ucsd.edu</em></p>
-      <p><strong>Dhruv Sehgal</strong> — <em>dsehgal@ucsd.edu</em></p>
-    </header>
+      <div class="page">
+        <h1>For each year, vegetation density changes with the season</h1>
+      </div>
 
-    <main>
+      <div class="page">
+        <h1>Page 3</h1>
+        <p>This is the third page.</p>
+      </div>
 
-        <section id="final-viz">
-            <h2>Greeness Over the Years in U.S.</h2>
-            <div class="controls">
-                <div class="item"><label for="startYear" >Start Year:</label></div>
-                <div class="item"><select id="startYear"></select></div>
-                <div class="item"><label for="endYear">End Year:</label></div>
-                <div class="item"><select id="endYear"></select></div>
-                <div class="item"><button id="updateButton">Update Line PLot</button></div>
-              </div>
-              <br>
-              <div class="linePlotDisplay">
-                <div id="viz"></div>
-                <div id="legend"></div>
-              </div>
+      <div class="page">
+        <h1>Page 4</h1>
+        <p>This is the fourth page.</p>
+      </div>
+    </div>
 
-          <figure>
-            <figcaption>
-              Select any two years such that the range between them is 5 years. Each colored line corresponds to a year, showing the trend of vegetation over the year in the U.S. overall. The x-axis represents the months, and the y-axis represents the density of current vegetation over the U.S.
-            </figcaption>
-          </figure>
-        </section>
-      
-
-      <section>
-
-        <h2>What have we done so far?</h2>
-        <ol>
-          <li>We chose NASA MODIS as our dataset and have finished most of our EDA.</li>
-          <li>We have compiled the data we are planning to use into .csv files, pulled from the .xml file acquired from the dataset.</li>
-          <li>We have started working on creating appropriate sized bins of vegetation density for the final visualization on a map and ways to plot it.</li>
-          <li>We are working on making our final presentation a more 'story-telling' format, experimenting with multiple map visualizations, etc. We want to show the trend of each season over the years.</li>
-          <li>We experimented with a slideshow format.</li>
-        </ol>
-
-      </section>
-
-      <section>
-
-        <h2>What will be the most challenging of your project to design and why?</h2>
-        <ol>
-          <li>As of right now, we believe the most challenging part to design would be a good story-telling format.</li>
-          <li>While we are currently experimenting on ways to do this, but since there are so many options, it is tough to decide on a final one.</li>
-          <li>So far, we have experimented with just one map combined with a line plot, only a map, a slideshow format like the gun deaths story-telling visualization covered in lecture, and even multiple maps for each year, each map showing the vegetation for each season.</li>
-          <li>For the visualization where we would show multiple maps for each season, experimenting with a slideshow format is technically difficult. Implementing a next page and also a previous page to update the visualization accordinly is turning out to be a bit challenging.</li>
-          <li>Coming up with an 'and-therfore' is okay, but coming up with a 'but' part of the story is somewhat difficult.</li>
-          <li>Also, while for now, we are only showing five years, we might look into methods that can show more than 5 years yet still not be cluttered.</li>
-        </ol>
-
-      </section>
-
-    </main>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c822b88e119346678db149ed7b7721c9","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+    <!-- Arrows -->
+    <div id="left-arrow">&#10094;</div>
+    <div id="right-arrow">&#10095;</div>
+  <script src="main.js"></script>
+  </body>
 </html>
