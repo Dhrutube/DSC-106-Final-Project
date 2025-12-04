@@ -248,7 +248,7 @@ var svgLine = d3.select('#lineViz')
     .attr("transform", "translate(" + lineMargin.left + "," + lineMargin.top + ")");
 
 function renderLinePlot(data) {
-    const startYear = 2015;
+    const startYear = 2000;
     const endYear = 2024;
 
     // Filter data to your year range
@@ -261,7 +261,7 @@ function renderLinePlot(data) {
 
     // Y scale: density values
     const y = d3.scaleLinear()
-        .domain([d3.min(filteredData, d => d.density), d3.max(filteredData, d => d.density)])
+        .domain([d3.min(filteredData, d => d.density) - 0.02, d3.max(filteredData, d => d.density) + 0.015])
         .range([lineHeight, 0]);
 
     // Draw X axis
@@ -290,7 +290,7 @@ function renderLinePlot(data) {
     .attr("font-size", "18px")
     .attr("font-weight", "bold")
     .attr("fill", "white") 
-    .text("Vegetation Density Declines Sharply");
+    .text("Vegetation Density Fluctuates Greatly");
 }
 
 // Init
