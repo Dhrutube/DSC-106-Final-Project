@@ -141,11 +141,11 @@ function drawLegendVertical(colors) {
 
     // Descriptions for each color
     const labels = [
-        "<= -1.5 (Large decrease)",       // everything below -1.5
-        "-1.5 to -0.5 (Small decrease)",  // -1.5 < value <= -0.5
-        "-0.5 to 0.5 (No change)",        // -0.5 < value <= 0.5
-        "0.5 to 1.5 (Small increase)",    // 0.5 < value <= 1.5
-        "> 1.5 (Large increase)"          // everything above 1.5
+        "Large decrease in 🌳",     // difference <= -1.5
+        "Moderate decrease in 🌳",  // -1.5 < diff <= -0.5
+        "Little to no change",              // -0.5 < diff <= 0.5
+        "Moderate increase in 🌳",  // 0.5 < diff <= 1.5
+        "Large increase in 🌳"      // diff > 1.5
     ];
 
 
@@ -218,7 +218,7 @@ function drawHeatmap(data, startYear, endYear) {
     const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
     const thresholds = [-1.5, -0.5, 0, 0.5, 1.5];
-    const colors = ["#4575b4","#91bfdb","#f0f0f0","#fc8d59","#d73027"];
+    const colors = ["#d73027", "#fc8d59","#f0f0f0", "#91bfdb","#4575b4"];
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
