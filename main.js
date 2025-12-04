@@ -245,7 +245,7 @@ function drawHeatmap(data, startYear, endYear) {
     const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
     const thresholds = [-1.5, -0.5, 0, 0.5, 1.5];
-    const colors = ["#ffd300", "#fce58b","#ffffbf", "#66c2a5","#006400"];
+    const colors = ["#c49a00", "#f4c542","#fff7a0", "#66c2a5","#006400"];
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
