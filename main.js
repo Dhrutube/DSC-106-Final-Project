@@ -141,17 +141,18 @@ function drawLegendVertical(colors) {
 
     // Descriptions for each color
     const labels = [
-        "Large decrease in 🌳",     // difference <= -1.5
-        "Moderate decrease in 🌳",  // -1.5 < diff <= -0.5
-        "Little to no change",              // -0.5 < diff <= 0.5
-        "Moderate increase in 🌳",  // 0.5 < diff <= 1.5
-        "Large increase in 🌳"      // diff > 1.5
+        "Large decrease in 🌳",
+        "Moderate decrease in 🌳",
+        "Little to no change",
+        "Moderate increase in 🌳",
+        "Large increase in 🌳"
     ];
+
 
 
     const legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", `translate(${width - rectWidth - padding- 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
+        .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
     
     // legend.append("text")
     //     .attr("class", "legend-title")
@@ -192,7 +193,7 @@ function drawLegendVertical(colors) {
     // First line
     title.append("tspan")
         .attr("x", 0)
-        .text("Difference in Density");
+        .text("Difference in Vegetation");
 
     // Second line (indented)
     title.append("tspan")
@@ -230,7 +231,7 @@ function drawHeatmap(data, startYear, endYear) {
         if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
             hasMissing = true;
         } else {
-            diff = valEnd - valStart; // simple difference
+            diff = valEnd - valStart;
         }
 
         return {
@@ -242,10 +243,18 @@ function drawHeatmap(data, startYear, endYear) {
     });
 
     // Filter out missing values for scale
-    const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
+    // const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
-    const thresholds = [-1.5, -0.5, 0, 0.5, 1.5];
-    const colors = ["#c49a00", "#f4c542","#fff7a0", "#66c2a5","#006400"];
+    // Dynamic thresholds based on distribution
+    const thresholds = [-20, -8, 8, 20]; 
+    const colors = [
+        "#c49a00",  // large decrease
+        "#f4c542",  // moderate decrease
+        "#fff7a0",  // little/no change
+        "#66c2a5",  // moderate increase
+        "#006400"   // large increase
+    ];
+        
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
