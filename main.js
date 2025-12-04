@@ -152,7 +152,14 @@ function drawLegendVertical(colors) {
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - rectWidth - padding- 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
-
+    
+    // legend.append("text")
+    //     .attr("class", "legend-title")
+    //     .attr("x", 0)
+    //     .attr("y", -10)
+    //     .attr("font-size", "14px")
+    //     .attr("font-weight", "bold")
+    //     .text("Diff in Density \nbetween 2024 and 2023");
     // Draw colored rectangles
     legend.selectAll("rect")
         .data(colors)
@@ -166,13 +173,33 @@ function drawLegendVertical(colors) {
 
     // Draw text labels to the right
     legend.selectAll("text")
+        legend.selectAll("text.legend-label")
         .data(labels)
         .join("text")
+        .attr("class", "legend-label")
         .attr("x", rectWidth + 5)
         .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
         .attr("font-size", "12px")
         .text(d => d);
-}
+    
+    const title = legend.append("text")
+        .attr("class", "legend-title")
+        .attr("x", 0)
+        .attr("y", -25)
+        .attr("font-size", "14px")
+        .attr("font-weight", "bold");
+
+    // First line
+    title.append("tspan")
+        .attr("x", 0)
+        .text("Difference in Density");
+
+    // Second line (indented)
+    title.append("tspan")
+        .attr("x", 0)     // indent by 10 px — adjust as needed
+        .attr("dy", 14)    // move down one line
+        .text("between 2024 and 2023");
+    }
 
 
 function drawHeatmap(data, startYear, endYear) {
@@ -218,7 +245,7 @@ function drawHeatmap(data, startYear, endYear) {
     const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
     const thresholds = [-1.5, -0.5, 0, 0.5, 1.5];
-    const colors = ["#d73027", "#fc8d59","#f0f0f0", "#91bfdb","#4575b4"];
+    const colors = ["#ffd300", "#fce58b","#ffffbf", "#66c2a5","#006400"];
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
