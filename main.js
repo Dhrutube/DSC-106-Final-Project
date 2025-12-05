@@ -181,6 +181,7 @@ function drawLegendVertical(colors) {
         .attr("x", rectWidth + 5)
         .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
         .attr("font-size", "12px")
+        .attr("fill", "white")   
         .text(d => d);
     
     const title = legend.append("text")
@@ -188,7 +189,8 @@ function drawLegendVertical(colors) {
         .attr("x", 0)
         .attr("y", -25)
         .attr("font-size", "14px")
-        .attr("font-weight", "bold");
+        .attr("font-weight", "bold")
+        .attr("fill", "white");
 
     // First line
     title.append("tspan")
@@ -200,7 +202,7 @@ function drawLegendVertical(colors) {
         .attr("x", 0)     // indent by 10 px — adjust as needed
         .attr("dy", 14)    // move down one line
         .text("between 2024 and 2023");
-    }
+}
 
 
 function drawHeatmap(data, startYear, endYear) {
@@ -267,7 +269,7 @@ function drawHeatmap(data, startYear, endYear) {
         .attr("y", d => (d.ypx - 1) * cellHeight)
         .attr("width", cellWidth)
         .attr("height", cellHeight)
-        .attr("fill", d => d.hasMissing ? "white" : colorScale(d.diff));
+        .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
     
     drawLegendVertical(colors);
 }
