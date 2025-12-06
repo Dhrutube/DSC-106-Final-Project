@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
-    const heatmapData = await d3.csv('heatmap_data.csv', (row) => ({
+    const heatmapData = await d3.csv('data/heatmap_data.csv', (row) => ({
         ...row,
         year: +row.year,
         x: +row.x,
@@ -74,7 +74,7 @@ async function loadData(){
         value: +row.value
   }));
 
-    const linePlotData = await d3.csv('heatmapDataWithState.csv', (row) =>({
+    const linePlotData = await d3.csv('data/heatmapDataWithState.csv', (row) =>({
         ...row,
         year: +row.year,
         density: +row.mean_evi,
@@ -329,8 +329,8 @@ function renderLinePlot(data, selectedState = "US") {
 
     grouped.sort((a, b) => a.year - b.year);
 
-    const startYear = d3.min(grouped, d => d.year);
-    const endYear = d3.max(grouped, d => d.year);
+    const startYear = 2000;
+    const endYear = 2015;
 
     // Scales
     const x = d3.scaleLinear()
