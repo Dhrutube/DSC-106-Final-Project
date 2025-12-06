@@ -66,12 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
-    const heatmapData = await d3.csv('heatmap_data.csv', (row) => ({
+    const heatmapData = await d3.csv('heatmapSd.csv', (row) => ({
         ...row,
-        year: +row.year,
+        hasMissing: +row.hasMissing,
         x: +row.x,
         y: +row.y,
-        value: +row.value
+        value: +row.value,
+        state: +row.state,
+        sd: +row.sd,
+        count: +row.count
   }));
 
     const linePlotData = await d3.csv('lineplot_data.csv', (row) =>({
@@ -79,6 +82,22 @@ async function loadData(){
         year: +row.year,
         density: +row.density
     }))
+
+    heatmapData.forEach(d => {
+        d.x = +d.x;
+        d.y = +d.y;
+        d.value = +d.value;
+        d.state = +d.state;
+
+        // Convert std: empty string -> NaN
+        d.std = d.std === "" ? NaN : +d.std;
+
+        // Convert hasMissing: treat anything >0 as true
+        d.hasMissing = d.hasMissing === "" || d.hasMissing === "NaN"
+            ? NaN
+            : (d.hasMissing === "True" || d.hasMissing === "true" || d.hasMissing === "1" || d.hasMissing === 1);
+    });
+
 
     return [heatmapData, linePlotData];
 }
@@ -130,38 +149,27 @@ const svg = d3.select("#viz")
   .attr("height", height);
 
 // Draw legend
-function drawLegendVertical(colors) {
-    // Remove old legend
+function drawLegendVertical(colors, thresholds) {
     svg.selectAll(".legend").remove();
+
+    const labels = [
+        `Large decrease (std < ${thresholds[0].toFixed(2)})`,
+        `Moderate decrease (${thresholds[0].toFixed(2)} – ${thresholds[1].toFixed(2)})`,
+        `Little to no change (${thresholds[1].toFixed(2)} – ${thresholds[2].toFixed(2)})`,
+        `Moderate increase (${thresholds[2].toFixed(2)} – ${thresholds[3].toFixed(2)})`,
+        `Large increase (>= ${thresholds[3].toFixed(2)})`,
+    ];
 
     const padding = 10;
     const rectWidth = 20;
     const rectHeight = 20;
     const spacing = 5;
 
-    // Descriptions for each color
-    const labels = [
-        "Large decrease in 🌳",
-        "Moderate decrease in 🌳",
-        "Little to no change",
-        "Moderate increase in 🌳",
-        "Large increase in 🌳"
-    ];
-
-
-
     const legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
-    
-    // legend.append("text")
-    //     .attr("class", "legend-title")
-    //     .attr("x", 0)
-    //     .attr("y", -10)
-    //     .attr("font-size", "14px")
-    //     .attr("font-weight", "bold")
-    //     .text("Diff in Density \nbetween 2024 and 2023");
-    // Draw colored rectangles
+        .attr("transform", `translate(${width - rectWidth - padding - 180}, 380)`);
+
+    // rectangles
     legend.selectAll("rect")
         .data(colors)
         .join("rect")
@@ -172,107 +180,75 @@ function drawLegendVertical(colors) {
         .attr("fill", d => d)
         .attr("stroke", "#000");
 
-    // Draw text labels to the right
-    legend.selectAll("text")
-        legend.selectAll("text.legend-label")
+    // labels
+    legend.selectAll("text.legend-label")
         .data(labels)
         .join("text")
         .attr("class", "legend-label")
-        .attr("x", rectWidth + 5)
-        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
+        .attr("x", rectWidth + 7)
+        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight - 4)
         .attr("font-size", "12px")
-        .attr("fill", "white")   
+        .attr("fill", "white")
         .text(d => d);
-    
-    const title = legend.append("text")
-        .attr("class", "legend-title")
+
+    // title
+    legend.append("text")
         .attr("x", 0)
-        .attr("y", -25)
+        .attr("y", -18)
         .attr("font-size", "14px")
         .attr("font-weight", "bold")
-        .attr("fill", "white");
-
-    // First line
-    title.append("tspan")
-        .attr("x", 0)
-        .text("Difference in Vegetation");
-
-    // Second line (indented)
-    title.append("tspan")
-        .attr("x", 0)     // indent by 10 px — adjust as needed
-        .attr("dy", 14)    // move down one line
-        .text("between 2024 and 2023");
+        .attr("fill", "white")
+        .text("Vegetation Variability (Std Dev)");
 }
 
-
-function drawHeatmap(data, startYear, endYear) {
-    const instruction = document.getElementById("instruction");
-    instruction.innerHTML = '';
-
+function drawHeatmap(data) {
     svg.selectAll("rect").remove();
 
-    // Filter data for the two years
-    const startData = data.filter(d => d.year == startYear);
-    const endData   = data.filter(d => d.year == endYear);
+    const stdValues = data
+        .map(d => d.std)
+        .filter(v => !isNaN(v))
+        .sort(d3.ascending);
 
-    // Build a lookup for fast access by x,y
-    const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
-    const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
+    if (stdValues.length === 0) {
+        console.error("ERROR: No valid std values found.");
+        return;
+    }
 
-    // Get all unique (x,y) pairs from either year
-    const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
+    const q20 = d3.quantile(stdValues, 0.20);
+    const q40 = d3.quantile(stdValues, 0.40);
+    const q60 = d3.quantile(stdValues, 0.60);
+    const q80 = d3.quantile(stdValues, 0.80);
 
-    const stats = Array.from(allKeys).map(key => {
-        const [x, y] = key.split(',').map(Number);
-        const valStart = startMap.get(key);
-        const valEnd   = endMap.get(key);
-
-        let diff = NaN;
-        let hasMissing = false;
-
-        if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
-            hasMissing = true;
-        } else {
-            diff = valEnd - valStart;
-        }
-
-        return {
-            xpx: x,
-            ypx: y,
-            diff,
-            hasMissing
-        };
-    });
-
-    // Filter out missing values for scale
-    // const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
-
-    // Dynamic thresholds based on distribution
-    const thresholds = [-20, -8, 8, 20]; 
+    const thresholds = [q20, q40, q60, q80];
     const colors = [
-        "#c49a00",  // large decrease
-        "#f4c542",  // moderate decrease
-        "#fff7a0",  // little/no change
-        "#66c2a5",  // moderate increase
-        "#006400"   // large increase
+        "#c49a00",  
+        "#f4c542",  
+        "#fff7a0",  
+        "#66c2a5",  
+        "#006400"
     ];
-        
+
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
-
-    // Draw heatmap
+    
     svg.selectAll("rect")
-        .data(stats)
+        .data(data)
         .join("rect")
-        .attr("x", d => (d.xpx - 1) * cellWidth)
-        .attr("y", d => (d.ypx - 1) * cellHeight)
+        .attr("x", d => (d.x - 1) * cellWidth)
+        .attr("y", d => (d.y - 1) * cellHeight)
         .attr("width", cellWidth)
         .attr("height", cellHeight)
-        .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
-    
-    drawLegendVertical(colors);
+        .attr("fill", d => {
+            const stdMissing = isNaN(d.std);
+
+            if (stdMissing) return "#212121"; // missing → black
+            return colorScale(d.std);
+        });
+
+    drawLegendVertical(colors, thresholds);
 }
+
 
 var lineMargin = {top: 20, right: 20, bottom: 30, left: 40},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
@@ -334,23 +310,9 @@ function renderLinePlot(data) {
 // Init
 async function init() {
     const [heatmapData, linePlotData] = await loadData();
-    const [startYear, endYear] = populateDropdowns(heatmapData);
 
-    const updateButton = document.getElementById("updateButton");
-    if (updateButton) {
-        updateButton.onclick = () => {
-            const startYear = parseInt(document.getElementById("startYear").value);
-            const endYear = parseInt(document.getElementById("endYear").value);
-            
-            if (startYear > endYear) {
-            alert("Start month must be before end month");
-            return;
-            }
-
-            svg.selectAll("*").remove();
-            drawHeatmap(heatmapData, startYear, endYear)
-        };
-    }
+    svg.selectAll("*").remove();
+    drawHeatmap(heatmapData);
     renderLinePlot(linePlotData);
     // generate dropdown options based on data
 }
