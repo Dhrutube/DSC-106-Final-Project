@@ -74,11 +74,12 @@ async function loadData(){
         value: +row.value
   }));
 
-    const linePlotData = await d3.csv('lineplot_data.csv', (row) =>({
+    const linePlotData = await d3.csv('heatmapDataWithState.csv', (row) =>({
         ...row,
         year: +row.year,
-        density: +row.density
-    }))
+        density: +row.mean_evi,
+        state: row.state
+    }));
 
     return [heatmapData, linePlotData];
 }
@@ -110,6 +111,23 @@ function populateDropdowns(data) {
   let endYear = endSelect.value;
   
   return [startYear, endYear];
+}
+
+function setupStateDropdown(data) {
+    const select = document.getElementById("stateSelect");
+
+    // List of states in the dataset
+    const states = Array.from(new Set(data.map(d => d.state))).sort();
+
+    select.innerHTML = "";
+
+    // Always add "US" option first
+    select.append(new Option("United States", "US"));
+
+    // Add states
+    states.forEach(state => {
+        select.append(new Option(state, state));
+    });
 }
 
 const scale = 2;
@@ -285,51 +303,79 @@ var svgLine = d3.select('#lineViz')
     .append("g")
     .attr("transform", "translate(" + lineMargin.left + "," + lineMargin.top + ")");
 
-function renderLinePlot(data) {
-    const startYear = 2000;
-    const endYear = 2024;
+function renderLinePlot(data, selectedState = "US") {
+    // Remove old chart content
+    svgLine.selectAll("*").remove();
 
-    // Filter data to your year range
-    const filteredData = data.filter(d => d.year >= startYear && d.year <= endYear);
+    // Group data
+    let grouped;
+    if (selectedState === "US") {
+        // Average by year for all states
+        grouped = d3.rollups(
+            data,
+            v => d3.mean(v, d => d.density),
+            d => d.year
+        ).map(([year, density]) => ({ year, density }));
+    } else {
+        // Filter by specific state
+        const filtered = data.filter(d => d.state === selectedState);
 
-    // X scale: years
+        grouped = d3.rollups(
+            filtered,
+            v => d3.mean(v, d => d.density),
+            d => d.year
+        ).map(([year, density]) => ({ year, density }));
+    }
+
+    grouped.sort((a, b) => a.year - b.year);
+
+    const startYear = d3.min(grouped, d => d.year);
+    const endYear = d3.max(grouped, d => d.year);
+
+    // Scales
     const x = d3.scaleLinear()
         .domain([startYear, endYear])
         .range([0, lineWidth]);
 
-    // Y scale: density values
     const y = d3.scaleLinear()
-        .domain([d3.min(filteredData, d => d.density) - 0.02, d3.max(filteredData, d => d.density) + 0.015])
+        .domain([
+            d3.min(grouped, d => d.density) - 0.01,
+            d3.max(grouped, d => d.density) + 0.01
+        ])
         .range([lineHeight, 0]);
 
-    // Draw X axis
+    // Axes
     svgLine.append("g")
         .attr("transform", `translate(0,${lineHeight})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format("d"))); // format as integers
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-    // Draw Y axis
     svgLine.append("g")
         .call(d3.axisLeft(y));
 
-    // Draw line
+    // Line
     svgLine.append("path")
-        .datum(filteredData)
+        .datum(grouped)
         .attr("fill", "none")
-        .attr("stroke", "#1f77b4") // any color you like
+        .attr("stroke", "#1f77b4")
         .attr("stroke-width", 2)
         .attr("d", d3.line()
             .x(d => x(d.year))
             .y(d => y(d.density))
         );
+
+    // Title
     svgLine.append("text")
-    .attr("x", lineWidth / 2)
-    .attr("y", -lineMargin.top / 2 + 10) // above the plot
-    .attr("text-anchor", "middle")
-    .attr("font-size", "18px")
-    .attr("font-weight", "bold")
-    .attr("fill", "white") 
-    .text("Vegetation Density Fluctuates Greatly");
+        .attr("x", lineWidth / 2)
+        .attr("y", -5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .attr("font-weight", "bold")
+        .attr("fill", "white")
+        .text(selectedState === "US"
+            ? "Mean EVI for the United States"
+            : `Mean EVI for ${selectedState}`);
 }
+
 
 // Init
 async function init() {
@@ -351,8 +397,11 @@ async function init() {
             drawHeatmap(heatmapData, startYear, endYear)
         };
     }
-    renderLinePlot(linePlotData);
-    // generate dropdown options based on data
+    setupStateDropdown(linePlotData);
+    document.getElementById("stateSelect").onchange = (e) => {
+        renderLinePlot(linePlotData, e.target.value);
+    };
+    renderLinePlot(linePlotData, "US");
 }
 
 init() 
