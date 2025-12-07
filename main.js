@@ -66,12 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
-    const heatmapData = await d3.csv('heatmap_data.csv', (row) => ({
+    const heatmapData = await d3.csv('heatmapDataWithState.csv', (row) => ({
         ...row,
         year: +row.year,
         x: +row.x,
         y: +row.y,
-        value: +row.value
+        value: +row.mean_evi/131,
+        state: +row.state
   }));
 
     const linePlotData = await d3.csv('lineplot_data.csv', (row) =>({
@@ -81,35 +82,6 @@ async function loadData(){
     }))
 
     return [heatmapData, linePlotData];
-}
-
-function populateDropdowns(data) {
- // Get unique years from data   
-  const years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-
-  const startSelect = document.getElementById("startYear");
-  const endSelect = document.getElementById("endYear");
-
-  // Clear existing options
-  startSelect.innerHTML = '';
-  endSelect.innerHTML = '';
-  
-  
-  // Assign repsective years to 1 - 12
-  for (let i = 0; i < years.length; i++){
-    const startOption = new Option(Number(years[i]));
-    const endOption = new Option(Number(years[i]));
-    
-    startSelect.add(startOption);
-    endSelect.add(endOption);
-  };
-  startSelect.value = 2012
-  endSelect.value = 2024
-  
-  let startYear = startSelect.value;
-  let endYear = endSelect.value;
-  
-  return [startYear, endYear];
 }
 
 const scale = 2;
@@ -130,7 +102,7 @@ const svg = d3.select("#viz")
   .attr("height", height);
 
 // Draw legend
-function drawLegendVertical(colors) {
+function drawLegendVertical(colors, startYear) {
     // Remove old legend
     svg.selectAll(".legend").remove();
 
@@ -148,20 +120,10 @@ function drawLegendVertical(colors) {
         "Large increase in 🌳"
     ];
 
-
-
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
-    
-    // legend.append("text")
-    //     .attr("class", "legend-title")
-    //     .attr("x", 0)
-    //     .attr("y", -10)
-    //     .attr("font-size", "14px")
-    //     .attr("font-weight", "bold")
-    //     .text("Diff in Density \nbetween 2024 and 2023");
-    // Draw colored rectangles
+
     legend.selectAll("rect")
         .data(colors)
         .join("rect")
@@ -201,78 +163,77 @@ function drawLegendVertical(colors) {
     title.append("tspan")
         .attr("x", 0)     // indent by 10 px — adjust as needed
         .attr("dy", 14)    // move down one line
-        .text("between 2024 and 2023");
+        .text(`between ${startYear+1} and ${startYear}`);
 }
 
+// function drawHeatmap(data, startYear, endYear) {
+//     const instruction = document.getElementById("instruction");
+//     instruction.innerHTML = '';
 
-function drawHeatmap(data, startYear, endYear) {
-    const instruction = document.getElementById("instruction");
-    instruction.innerHTML = '';
+//     svg.selectAll("rect").remove();
 
-    svg.selectAll("rect").remove();
+//     // Filter data for the two years
+//     const startData = data.filter(d => d.year == startYear);
+//     const endData   = data.filter(d => d.year == endYear);
 
-    // Filter data for the two years
-    const startData = data.filter(d => d.year == startYear);
-    const endData   = data.filter(d => d.year == endYear);
+//     // Build a lookup for fast access by x,y
+//     const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
+//     const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
 
-    // Build a lookup for fast access by x,y
-    const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
-    const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
+//     // Get all unique (x,y) pairs from either year
+//     const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
 
-    // Get all unique (x,y) pairs from either year
-    const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
+//     const stats = Array.from(allKeys).map(key => {
+//         const [x, y] = key.split(',').map(Number);
+//         const valStart = startMap.get(key);
+//         const valEnd   = endMap.get(key);
 
-    const stats = Array.from(allKeys).map(key => {
-        const [x, y] = key.split(',').map(Number);
-        const valStart = startMap.get(key);
-        const valEnd   = endMap.get(key);
+//         let diff = NaN;
+//         let hasMissing = false;
 
-        let diff = NaN;
-        let hasMissing = false;
+//         if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
+//             hasMissing = true;
+//         } else {
+//             diff = valEnd - valStart;
+//         }
 
-        if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
-            hasMissing = true;
-        } else {
-            diff = valEnd - valStart;
-        }
+//         return {
+//             xpx: x,
+//             ypx: y,
+//             diff,
+//             hasMissing
+//         };
+//     });
 
-        return {
-            xpx: x,
-            ypx: y,
-            diff,
-            hasMissing
-        };
-    });
+//     // Filter out missing values for scale
+//     // const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
 
-    // Filter out missing values for scale
-    // const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
-
-    // Dynamic thresholds based on distribution
-    const thresholds = [-20, -8, 8, 20]; 
-    const colors = [
-        "#c49a00",  // large decrease
-        "#f4c542",  // moderate decrease
-        "#fff7a0",  // little/no change
-        "#66c2a5",  // moderate increase
-        "#006400"   // large increase
-    ];
+//     // Dynamic thresholds based on distribution
+//     const thresholds = [-20, -8, 8, 20]; 
+//     const colors = [
+//         "#c49a00",  // large decrease
+//         "#f4c542",  // moderate decrease
+//         "#fff7a0",  // little/no change
+//         "#66c2a5",  // moderate increase
+//         "#006400"   // large increase
+//     ];
         
-    const colorScale = d3.scaleThreshold()
-        .domain(thresholds)
-        .range(colors);
+//     const colorScale = d3.scaleThreshold()
+//         .domain(thresholds)
+//         .range(colors);
 
-    // Draw heatmap
-    svg.selectAll("rect")
-        .data(stats)
-        .join("rect")
-        .attr("x", d => (d.xpx - 1) * cellWidth)
-        .attr("y", d => (d.ypx - 1) * cellHeight)
-        .attr("width", cellWidth)
-        .attr("height", cellHeight)
-        .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
+//     // Draw heatmap
+//     svg.selectAll("rect")
+//         .data(stats)
+//         .join("rect")
+//         .attr("x", d => (d.xpx - 1) * cellWidth)
+//         .attr("y", d => (d.ypx - 1) * cellHeight)
+//         .attr("width", cellWidth)
+//         .attr("height", cellHeight)
+//         .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
     
-    drawLegendVertical(colors);
-}
+//     drawLegendVertical(colors);
+// }
 
 var lineMargin = {top: 20, right: 20, bottom: 30, left: 40},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
@@ -285,10 +246,7 @@ var svgLine = d3.select('#lineViz')
     .append("g")
     .attr("transform", "translate(" + lineMargin.left + "," + lineMargin.top + ")");
 
-function renderLinePlot(data) {
-    const startYear = 2000;
-    const endYear = 2024;
-
+function renderLinePlot(data, startYear) {
     // Filter data to your year range
     const filteredData = data.filter(d => d.year >= startYear && d.year <= endYear);
 
@@ -332,27 +290,101 @@ function renderLinePlot(data) {
 }
 
 // Init
+function updateHeatMap(data, startYear) {
+    svg.selectAll("rect").remove();
+    const startData = data.filter(d => d.year == startYear);
+    const endData   = data.filter(d => d.year == startYear + 1);
+
+    const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
+    const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
+
+    const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
+
+    const stats = Array.from(allKeys).map(key => {
+        const [x, y] = key.split(',').map(Number);
+        const valStart = startMap.get(key);
+        const valEnd   = endMap.get(key);
+
+        let diff = NaN;
+        let hasMissing = false;
+
+        if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
+            hasMissing = true;
+        } else {
+            diff = valEnd - valStart;
+        }
+
+        return {
+            xpx: x,
+            ypx: y,
+            diff,
+            hasMissing
+        };
+    });   
+
+    // Dynamic thresholds based on distribution
+    const thresholds = [-0.4, -0.15, 0.15, 0.4];
+    const colors = [
+        "#c49a00",  // large decrease
+        "#f4c542",  // moderate decrease
+        "#fff7a0",  // little/no change
+        "#66c2a5",  // moderate increase
+        "#006400"   // large increase
+    ];
+
+        const colorScale = d3.scaleThreshold()
+        .domain(thresholds)
+        .range(colors);
+
+    // Draw heatmap
+    svg.selectAll("rect")
+        .data(stats)
+        .join("rect")
+        .attr("x", d => (d.xpx - 1) * cellWidth)
+        .attr("y", d => (d.ypx - 1) * cellHeight)
+        .attr("width", cellWidth)
+        .attr("height", cellHeight)
+        .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
+    
+    drawLegendVertical(colors, startYear);
+}
+
+
 async function init() {
     const [heatmapData, linePlotData] = await loadData();
-    const [startYear, endYear] = populateDropdowns(heatmapData);
 
-    const updateButton = document.getElementById("updateButton");
-    if (updateButton) {
-        updateButton.onclick = () => {
-            const startYear = parseInt(document.getElementById("startYear").value);
-            const endYear = parseInt(document.getElementById("endYear").value);
+    let currentYear = 2000;
+    
+    // Initial heatmap
+    updateHeatMap(heatmapData, currentYear);
+
+    const timeSlider = document.getElementById('time-slider');
+    const selectedTime = document.getElementById("selected-Year-Range");
+    const anyTimeLabel = document.getElementById('any-time');
+
+    function updateTimeDisplay(){
+        let timeFilter = Number(timeSlider.value);
+        
+        if (timeFilter === -1){
+            selectedTime.textContent = '';
+            anyTimeLabel.style.display = 'block';
+        }
+        else {
+            currentYear = 2000 + timeFilter; // Update the current year
             
-            if (startYear > endYear) {
-            alert("Start month must be before end month");
-            return;
-            }
-
-            svg.selectAll("*").remove();
-            drawHeatmap(heatmapData, startYear, endYear)
-        };
+            selectedTime.textContent = `${currentYear}-${currentYear + 1}`;
+            anyTimeLabel.style.display = 'none';
+            
+            // Update heatmap with current year
+            updateHeatMap(heatmapData, currentYear);
+        }
     }
-    renderLinePlot(linePlotData);
-    // generate dropdown options based on data
+
+    timeSlider.addEventListener('input', updateTimeDisplay);
+    
+    // Set initial display
+    timeSlider.value = "0"; // Show 2000-2001 initially
+    updateTimeDisplay();
 }
 
 init() 

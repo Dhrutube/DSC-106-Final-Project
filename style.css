@@ -120,7 +120,17 @@ body {
 }
 
 /* =========== Ricky's CSS*/
-.controls {
+header {
+    display: flex;
+    align-items: baseline;
+    padding: 0 1rem;
+}
+
+header p {
+    display: block;
+}
+
+/* .controls {
   display: flex;
   border-bottom-width: 1px;
   margin-bottom: 1rem;
@@ -138,13 +148,13 @@ body {
   text-align: center;  
   padding-top: 10px;
   height: 100%; 
-}
+} */
 
 .page.active {
   opacity: 1;
   pointer-events: auto;
 }
-
+/* 
 .controls select {
   padding: 0.5rem;
   border: 1px solid oklch(80% 3% 200);
@@ -152,15 +162,16 @@ body {
   background: var(--bg, white);
   color: gray;
   min-width: 10rem;
-}
+} */
 
-.controls button {
+/* .controls button {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
   font-weight: bold;
   cursor: pointer;
-}
+} */
+ 
 
 .heatmapDisplay {
   margin-bottom: 50px;   /* extra scroll space */
@@ -169,3 +180,6 @@ body {
 .linePlotDisplay {
   margin-bottom: 50px;
 }
+
+
+/* Play anmation CSS */
