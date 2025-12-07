@@ -303,7 +303,7 @@ function drawHeatmap(data, startYear, endYear) {
     drawLegendVertical(colors);
 }
 
-var lineMargin = {top: 20, right: 20, bottom: 30, left: 40},
+var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -459,7 +459,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
     svgLine.append("path")
         .datum(grouped)
         .attr("fill", "none")
-        .attr("stroke", "#76C7C0")
+        .attr("stroke", "#47e664ff")
         .attr("stroke-width", 2)
         .attr("d", d3.line()
             .x(d => x(d.year))
@@ -485,7 +485,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .datum(co2Data)
         .attr("class", "co2-line")
         .attr("fill", "none")
-        .attr("stroke", "#ff5733")
+        .attr("stroke", "#71ffd9ff")
         .attr("stroke-width", 2)
         .attr("stroke-dasharray", "5 2")
         .attr("d", d3.line()
@@ -506,8 +506,8 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("fill", "white")
         .text(
             selectedState === "US"
-                ? "Mean EVI and Drought Index for the United States"
-                : `Mean EVI and Drought Index for ${selectedState}`
+                ? "Mean EVI for the United States"
+                : `Mean EVI for ${selectedState}`
         );
     
     d3.select("#toggleDrought").on("change", function () {
@@ -533,13 +533,13 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
     });
 
     // ----- LEGEND -----
-    svgLine.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#76C7C0");
+    svgLine.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#47e664ff");
     svgLine.append("text").attr("x", 25).attr("y", 25).text("EVI").attr("fill", "white");
 
     svgLine.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
     svgLine.append("text").attr("x", 25).attr("y", 50).text("Drought Index").attr("fill", "white");
 
-    svgLine.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#ff5733");
+    svgLine.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
     svgLine.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels").attr("fill", "white");
 }
 
@@ -567,6 +567,11 @@ async function init() {
     }
     setupStateDropdown(linePlotData);
     document.getElementById("stateSelect").onchange = (e) => {
+        // Reset checkboxes
+        d3.select("#toggleDrought").property("checked", false);
+        d3.select("#toggleCO2").property("checked", false);
+        
+        // redraw line plot
         renderLinePlot(linePlotData, e.target.value, droughtData, co2Data);
     };
     renderLinePlot(linePlotData, "US", droughtData, co2Data);

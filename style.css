@@ -142,9 +142,22 @@ body {
   cursor: pointer;
 }
 
-.linePlotLabel {
-  margin-bottom: 20px;
+.linePlotCitation {
+  font-size: 12px;
+  color: #ccc;
+  text-align: center;
+  margin-top: 5px;
 }
+
+.linePlotCitation a {
+  color: #47e664ff; /* matches your EVI line color */
+  text-decoration: none;
+}
+
+.linePlotCitation a:hover {
+  text-decoration: underline;
+}
+
 
 /* =========== Ricky's CSS*/
 .controls {
