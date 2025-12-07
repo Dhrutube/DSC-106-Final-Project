@@ -142,6 +142,9 @@ body {
   cursor: pointer;
 }
 
+.linePlotLabel {
+  margin-bottom: 20px;
+}
 
 /* =========== Ricky's CSS*/
 .controls {
@@ -191,5 +194,5 @@ body {
 }
 
 .linePlotDisplay {
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }

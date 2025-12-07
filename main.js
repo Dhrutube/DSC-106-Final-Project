@@ -81,7 +81,13 @@ async function loadData(){
         state: row.state
     }));
 
-    return [heatmapData, linePlotData];
+    const droughtData = await d3.csv('data/drought_fig-1.csv', (row) => ({
+        ...row,
+        year: +row.Year,
+        drought: +row['Annual average']
+    }));
+
+    return [heatmapData, linePlotData, droughtData];
 }
 
 function populateDropdowns(data) {
@@ -303,23 +309,20 @@ var svgLine = d3.select('#lineViz')
     .append("g")
     .attr("transform", "translate(" + lineMargin.left + "," + lineMargin.top + ")");
 
-function renderLinePlot(data, selectedState = "US") {
-    // Remove old chart content
+function renderLinePlot(data, selectedState = "US", droughtData = []) {
+    // Remove old content
     svgLine.selectAll("*").remove();
 
-    // Group data
+    // ----- EVI DATA (left axis) -----
     let grouped;
     if (selectedState === "US") {
-        // Average by year for all states
         grouped = d3.rollups(
             data,
             v => d3.mean(v, d => d.density),
             d => d.year
         ).map(([year, density]) => ({ year, density }));
     } else {
-        // Filter by specific state
         const filtered = data.filter(d => d.state === selectedState);
-
         grouped = d3.rollups(
             filtered,
             v => d3.mean(v, d => d.density),
@@ -329,57 +332,136 @@ function renderLinePlot(data, selectedState = "US") {
 
     grouped.sort((a, b) => a.year - b.year);
 
-    const startYear = 2000;
-    const endYear = 2015;
+    // ----- SCALES -----
 
-    // Scales
+    // X scale (shared)
+    const years = grouped.map(d => d.year);
+    const allYears = d3.extent([
+        ...years,
+        ...droughtData.map(d => d.year)
+    ]);
+
     const x = d3.scaleLinear()
-        .domain([startYear, endYear])
+        .domain(allYears)
         .range([0, lineWidth]);
 
-    const y = d3.scaleLinear()
+    // Left Y scale (EVI)
+    const yLeft = d3.scaleLinear()
         .domain([
-            d3.min(grouped, d => d.density) - 0.01,
-            d3.max(grouped, d => d.density) + 0.01
+            d3.min(grouped, d => d.density) - 0.02,
+            d3.max(grouped, d => d.density) + 0.02
         ])
         .range([lineHeight, 0]);
 
-    // Axes
+    // Right Y scale (Drought)
+    const yRight = d3.scaleLinear()
+        .domain(d3.extent(droughtData, d => d.drought))
+        .range([lineHeight, 0]);
+
+
+    // ----- AXES -----
+
+    // Bottom x-axis
     svgLine.append("g")
-        .attr("transform", `translate(0,${lineHeight})`)
+        .attr("transform", `translate(0, ${lineHeight})`)
         .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
+    // Left y-axis (EVI)
     svgLine.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(yLeft))
+        .append("text")
+        .attr("fill", "white")
+        .attr("x", -40)
+        .attr("y", -10)
+        .text("Mean EVI");
 
-    // Line
+    // Right y-axis (Drought Index)
+    svgLine.append("g")
+        .attr("transform", `translate(${lineWidth}, 0)`)
+        .call(d3.axisRight(yRight))
+        .attr("class", "yAxisDrought")
+        .append("text")
+        .attr("fill", "white")
+        .attr("x", 40)
+        .attr("y", -10)
+        .text("Drought Index");
+
+
+    // ----- LINES -----
+
+    // EVI line
     svgLine.append("path")
         .datum(grouped)
         .attr("fill", "none")
-        .attr("stroke", "#1f77b4")
+        .attr("stroke", "#76C7C0")
         .attr("stroke-width", 2)
         .attr("d", d3.line()
             .x(d => x(d.year))
-            .y(d => y(d.density))
+            .y(d => yLeft(d.density))
         );
 
-    // Title
+    // Drought line
+    svgLine.append("path")
+        .datum(droughtData)
+        .attr("class", "drought-line")
+        .attr("fill", "none")
+        .attr("stroke", "#ffcc00")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "4 2")  // dashed so user knows it's separate
+        .attr("d", d3.line()
+            .x(d => x(d.year))
+            .y(d => yRight(d.drought))
+        );
+
+    // plot title
     svgLine.append("text")
+        .attr("class", "plotTitle")
         .attr("x", lineWidth / 2)
-        .attr("y", -5)
+        .attr("y", 10)
         .attr("text-anchor", "middle")
         .attr("font-size", "18px")
         .attr("font-weight", "bold")
         .attr("fill", "white")
-        .text(selectedState === "US"
-            ? "Mean EVI for the United States"
-            : `Mean EVI for ${selectedState}`);
+        .text(
+            selectedState === "US"
+                ? "Mean EVI and Drought Index for the United States"
+                : `Mean EVI and Drought Index for ${selectedState}`
+        );
+
+    d3.select("#toggleDrought").on("change", function() {
+        const visible = this.checked ? "visible" : "hidden";
+
+        // Toggle drought line
+        d3.selectAll(".drought-line").style("visibility", visible);
+
+        // Toggle drought Y-axis
+        d3.select(".yAxisDrought").style("visibility", visible);
+
+        // Change title
+        d3.select(".plotTitle").text(
+            visible === "visible"
+                ? (selectedState === "US"
+                    ? "Mean EVI and Drought Index for the United States"
+                    : `Mean EVI and Drought Index for ${selectedState}`)
+                : (selectedState === "US"
+                    ? "Mean EVI for the United States"
+                    : `Mean EVI for ${selectedState}`)
+        );
+    });
+
+    // ----- LEGEND -----
+    svgLine.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#76C7C0");
+    svgLine.append("text").attr("x", 25).attr("y", 25).text("EVI").attr("fill", "white");
+
+    svgLine.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
+    svgLine.append("text").attr("x", 25).attr("y", 50).text("Drought Index").attr("fill", "white");
 }
+
 
 
 // Init
 async function init() {
-    const [heatmapData, linePlotData] = await loadData();
+    const [heatmapData, linePlotData, droughtData] = await loadData();
     const [startYear, endYear] = populateDropdowns(heatmapData);
 
     const updateButton = document.getElementById("updateButton");
@@ -399,9 +481,9 @@ async function init() {
     }
     setupStateDropdown(linePlotData);
     document.getElementById("stateSelect").onchange = (e) => {
-        renderLinePlot(linePlotData, e.target.value);
+        renderLinePlot(linePlotData, e.target.value, droughtData);
     };
-    renderLinePlot(linePlotData, "US");
+    renderLinePlot(linePlotData, "US", droughtData);
 }
 
 init() 
