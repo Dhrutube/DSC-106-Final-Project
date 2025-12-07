@@ -31,29 +31,27 @@
       <div class="page">
         <h2>In a perfect world, the vegetation density would remain relatively stable every year <br>
         and there would be minimal difference in vegetation density</h2>
-        <p>... but because climate change affects the seasons, there is a visible difference in vegetation density between years. But is this really the case?</p>
+        <p>... but because climate change affects the seasons, there is a visible difference in vegetation density between years. But is this really the case? 
+          <br> <i>Scroll to see the degree of change over 25 years</i> </p>
           
-        <header>
-          <label>
-              <p><i>Scroll to see the degree of change over 25 years</i></p>
-              <input id="time-slider" type="range" min="0" max="4" value = "0">
-          </label>
+        <header id="slider-container">
+          <div class="slider-wrapper">
+            <label for="time-slider" class="slider-label">Select Year Range:</label>
+            <input id="time-slider" type="range" min="0" max="4" value="0" step="1">
+            <span id="selected-Year-Range">2000-2004</span>
+          </div>
         </header>
 
-        <p>
-          <em id="any-time">(any year)</em>
-          <time id="selected-Year-Range">2000-2004</time>
-        </p>
+        <div class="heatmapDisplay">
+          <div id="viz"></div>
+          <div id="legend"></div>
+        </div>
 
-          <div class="heatmapDisplay">
-            <div id="viz"></div>
-            <div id="legend"></div>
-          </div>
+        <div id="info-box-container">
+          <ul id="info-box"><h3>Area (%) With Decrease in Vegetation</h3></ul>
+        </div>
 
-        <p>The above is the change in density (normalized vegetation) between the summer of 2023 and 2024. <br>
-          For reference, the greatest possible absolute change is 2. In this case, we see a noticeable decline in vegetation.</p>
-
-      </div>v
+      </div>
 
       <div class="page">
         <h2>During the summer months, the vegetation density has been volatile year by year</h2>

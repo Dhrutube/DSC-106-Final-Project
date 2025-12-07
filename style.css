@@ -7,10 +7,75 @@ body {
 }
 
 #slider-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #2c2c2c;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.slider-label {
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 140px;
+}
+
+#time-slider {
+    -webkit-appearance: none;
+    width: 300px;
+    height: 6px;
+    border-radius: 3px;
+    background: #555;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#time-slider:hover {
+    background: #777;
+}
+
+#time-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #47e664;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#time-slider::-webkit-slider-thumb:hover {
+    background: #3ebc57;
+    transform: scale(1.2);
+}
+
+#time-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #47e664;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#selected-Year-Range {
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 90px;
+    text-align: center;
 }
 
 .page {
@@ -150,7 +215,7 @@ body {
 }
 
 .linePlotCitation a {
-  color: #47e664ff; /* matches your EVI line color */
+  color: #47e664ff;
   text-decoration: none;
 }
 
@@ -159,7 +224,6 @@ body {
 }
 
 
-/* =========== Ricky's CSS*/
 .controls {
   display: flex;
   border-bottom-width: 1px;
@@ -203,9 +267,59 @@ body {
 }
 
 .heatmapDisplay {
-  margin-bottom: 50px;   /* extra scroll space */
+  margin-bottom: 10px;   /* extra scroll space */
 }
 
 .linePlotDisplay {
   margin-bottom: 20px;
 }
+
+#info-box-container {
+    display: flex;
+    justify-content: center;   /* center the box */
+    margin-top: 20px;
+}
+
+#info-box {
+    display: flex;
+    padding: 16px 24px;        /* padding inside the box */
+    background: #2c2c2c;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    color: #fff;
+    flex-wrap: nowrap;         /* keep in one row */
+    width: auto;               /* hug content */
+    max-width: 100%;           /* don't overflow screen */
+    gap: 24px;                 /* space between columns */
+}
+
+
+#info-box li {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    white-space: nowrap;      /* prevent text wrapping */
+    display: flex;
+    flex-direction: column;   /* stack name above value */
+    align-items: center;
+    padding: 8px;
+}
+
+.region-name {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.region-value {
+    font-size: 1.2em;
+}
+
+.region-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    pointer-events: all;
+}
+
+
