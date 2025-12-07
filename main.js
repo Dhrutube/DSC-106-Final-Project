@@ -302,8 +302,8 @@ function updateActiveLine({ active, selectedState }) {
 
         title.text(
             selectedState === "US"
-                ? "Mean EVI and Drought Index for the United States"
-                : `Mean EVI and Drought Index for ${selectedState}`
+                ? "Mean Vegetation Density and Drought Index for the United States"
+                : `Mean Vegetation Density and Drought Index for ${selectedState}`
         );
     }
 
@@ -314,8 +314,8 @@ function updateActiveLine({ active, selectedState }) {
 
         title.text(
             selectedState === "US"
-                ? "Mean EVI and CO₂ Levels for the United States"
-                : `Mean EVI and CO₂ Levels for ${selectedState}`
+                ? "Mean Vegetation Density and CO₂ Levels for the United States"
+                : `Mean Vegetation Density and CO₂ Levels for ${selectedState}`
         );
     }
 
@@ -323,8 +323,8 @@ function updateActiveLine({ active, selectedState }) {
     else {
         title.text(
             selectedState === "US"
-                ? "Mean EVI for the United States"
-                : `Mean EVI for ${selectedState}`
+                ? "Mean Vegetation Density for the United States"
+                : `Mean Vegetation Density for ${selectedState}`
         );
     }
 }
@@ -397,7 +397,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("fill", "white")
         .attr("x", -40)
         .attr("y", -10)
-        .text("Mean EVI");
+        .text("Mean Vegetation Density");
 
     // Right y-axis (Drought Index)
     svgLine.append("g")
@@ -476,8 +476,8 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("fill", "white")
         .text(
             selectedState === "US"
-                ? "Mean EVI for the United States"
-                : `Mean EVI for ${selectedState}`
+                ? "Mean Vegetation Density for the United States"
+                : `Mean Vegetation Density for ${selectedState}`
         );
     
     d3.select("#toggleDrought").on("change", function () {
@@ -504,7 +504,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
 
     // ----- LEGEND -----
     svgLine.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#47e664ff");
-    svgLine.append("text").attr("x", 25).attr("y", 25).text("EVI").attr("fill", "white");
+    svgLine.append("text").attr("x", 25).attr("y", 25).text("Vegetation Density").attr("fill", "white");
 
     svgLine.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
     svgLine.append("text").attr("x", 25).attr("y", 50).text("Drought Index").attr("fill", "white");

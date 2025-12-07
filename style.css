@@ -158,6 +158,9 @@ body {
   text-decoration: underline;
 }
 
+p.bottom {
+  margin-bottom: 30px;
+}
 
 /* =========== Ricky's CSS*/
 .controls {
