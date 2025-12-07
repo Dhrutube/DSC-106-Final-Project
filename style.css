@@ -162,6 +162,23 @@ p.bottom {
   margin-bottom: 30px;
 }
 
+#lineTooltip {
+    position: fixed;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.tooltip-overlay {
+    fill: none;
+    pointer-events: all;
+}
+
 /* =========== Ricky's CSS*/
 .controls {
   display: flex;

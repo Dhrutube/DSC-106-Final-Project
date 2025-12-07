@@ -273,7 +273,7 @@ function updateHeatMap(data, startYear) {
     drawLegendVertical(colors, startYear);
 }
 
-var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
+var lineMargin = {top: 30, right: 40, bottom: 30, left: 40},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -284,7 +284,11 @@ var svgLine = d3.select('#lineViz')
     .append("g")
     .attr("transform", "translate(" + lineMargin.left + "," + lineMargin.top + ")");
 
+let activeLine = null;
+
 function updateActiveLine({ active, selectedState }) {
+    activeLine = active;
+
     // Hide both lines & both axes first
     d3.selectAll(".drought-line").style("visibility", "hidden");
     d3.select(".yAxisDrought").style("visibility", "hidden");
@@ -351,18 +355,14 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
     }
 
     grouped.sort((a, b) => a.year - b.year);
+    grouped = grouped.filter(d => d.year >= 2000 && d.year <= 2015);
+    droughtData = droughtData.filter(d => d.year >= 2000 && d.year <= 2015);
+    co2Data = co2Data.filter(d => d.year >= 2000 && d.year <= 2015);
 
     // ----- SCALES -----
-
-    // X scale (shared)
-    const years = grouped.map(d => d.year);
-    const allYears = d3.extent([
-        ...years,
-        ...droughtData.map(d => d.year)
-    ]);
-
+    // X scale (restricted to 2000–2015)
     const x = d3.scaleLinear()
-        .domain(allYears)
+        .domain([2000, 2015])
         .range([0, lineWidth]);
 
     // Left Y scale (EVI)
@@ -378,19 +378,17 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .domain(d3.extent(droughtData, d => d.drought))
         .range([lineHeight, 0]);
 
-    // Right y-axis for CO2
+    // Right Y scale (CO2)
     const yRightCO2 = d3.scaleLinear()
         .domain(d3.extent(co2Data, d => d.co2))
         .range([lineHeight, 0]);
 
     // ----- AXES -----
-
-    // Bottom x-axis
     svgLine.append("g")
         .attr("transform", `translate(0, ${lineHeight})`)
         .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-    // Left y-axis (EVI)
+    // EVI
     svgLine.append("g")
         .call(d3.axisLeft(yLeft))
         .append("text")
@@ -399,7 +397,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("y", -10)
         .text("Mean Vegetation Density");
 
-    // Right y-axis (Drought Index)
+    // drought
     svgLine.append("g")
         .attr("transform", `translate(${lineWidth}, 0)`)
         .call(d3.axisRight(yRight))
@@ -411,12 +409,12 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("y", -10)
         .text("Drought Index");
 
-    // Right y-axis (co2 level)
+    // CO2
     svgLine.append("g")
         .attr("class", "yAxisCO2")
         .attr("transform", `translate(${lineWidth}, 0)`)
         .call(d3.axisRight(yRightCO2))
-        .style("visibility", "hidden") 
+        .style("visibility", "hidden")
         .append("text")
         .attr("fill", "white")
         .attr("x", 40)
@@ -424,17 +422,39 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .text("CO₂ Levels");
 
     // ----- LINES -----
-
     // EVI line
+    const eviLine = d3.line()
+        .x(d => x(d.year))
+        .y(d => yLeft(d.density));
+
+    // Visible EVI line
     svgLine.append("path")
         .datum(grouped)
+        .attr("class", "evi-visible")
         .attr("fill", "none")
         .attr("stroke", "#47e664ff")
         .attr("stroke-width", 2)
-        .attr("d", d3.line()
-            .x(d => x(d.year))
-            .y(d => yLeft(d.density))
-        );
+        .attr("d", eviLine);
+
+    const overlay = svgLine.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", lineWidth)
+        .attr("height", lineHeight)
+        .attr("fill", "transparent")
+        .style("cursor", "crosshair")
+        .on("mousemove", onOverlayMouseMove)
+        .on("mouseleave", onOverlayMouseLeave);
+
+    // Dotted tooltip line
+    const hoverLine = svgLine.append("line")
+        .attr("class", "hover-line")
+        .attr("y1", 0)
+        .attr("y2", lineHeight)
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "4 4")
+        .style("visibility", "hidden");
 
     // Drought line
     svgLine.append("path")
@@ -443,14 +463,14 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         .attr("fill", "none")
         .attr("stroke", "#ffcc00")
         .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "4 2")  // dashed so user knows it's separate
+        .attr("stroke-dasharray", "4 2")
         .attr("d", d3.line()
             .x(d => x(d.year))
             .y(d => yRight(d.drought))
         )
         .style("visibility", "hidden");
 
-    // co2 line
+    // CO2 line
     svgLine.append("path")
         .datum(co2Data)
         .attr("class", "co2-line")
@@ -464,12 +484,11 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
         )
         .style("visibility", "hidden");
 
-
     // plot title
     svgLine.append("text")
         .attr("class", "plotTitle")
         .attr("x", lineWidth / 2)
-        .attr("y", 10)
+        .attr("y", -5)
         .attr("text-anchor", "middle")
         .attr("font-size", "18px")
         .attr("font-weight", "bold")
@@ -479,12 +498,11 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
                 ? "Mean Vegetation Density for the United States"
                 : `Mean Vegetation Density for ${selectedState}`
         );
-    
+
+    // ----- CHECKBOX LOGIC -----
     d3.select("#toggleDrought").on("change", function () {
         if (this.checked) {
-            // Turn off CO₂ checkbox
             d3.select("#toggleCO2").property("checked", false);
-
             updateActiveLine({ active: "drought", selectedState });
         } else {
             updateActiveLine({ active: null, selectedState });
@@ -493,9 +511,7 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
 
     d3.select("#toggleCO2").on("change", function () {
         if (this.checked) {
-            // Turn off drought checkbox
             d3.select("#toggleDrought").property("checked", false);
-
             updateActiveLine({ active: "co2", selectedState });
         } else {
             updateActiveLine({ active: null, selectedState });
@@ -511,7 +527,71 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
 
     svgLine.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
     svgLine.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels").attr("fill", "white");
+
+    // ----- TOOLTIP -----
+    const tooltip = d3.select("#lineTooltip");
+
+    function onOverlayMouseMove(event) {
+        const [mouseX] = d3.pointer(event, this);
+        const year = Math.round(x.invert(mouseX));
+
+        // --- Snap to nearest EVI point ---
+        const closestEVI = grouped.reduce((a, b) =>
+            Math.abs(b.year - year) < Math.abs(a.year - year) ? b : a
+        );
+        const cx = x(closestEVI.year);
+        const cy = yLeft(closestEVI.density);
+
+        // Show vertical line
+        hoverLine.attr("x1", cx).attr("x2", cx).style("visibility", "visible");
+
+        // Tooltip content
+        let tooltipHTML = `
+            <strong>Year:</strong> ${closestEVI.year}<br>
+            <strong>EVI:</strong> ${closestEVI.density.toFixed(3)}
+        `;
+
+        if (activeLine === "drought") {
+            const closestDrought = droughtData.reduce((a, b) =>
+                Math.abs(b.year - year) < Math.abs(a.year - year) ? b : a
+            );
+            tooltipHTML += `<br><strong>Drought Index:</strong> ${closestDrought.drought.toFixed(3)}`;
+        } else if (activeLine === "co2") {
+            const closestCO2 = co2Data.reduce((a, b) =>
+                Math.abs(b.year - year) < Math.abs(a.year - year) ? b : a
+            );
+            tooltipHTML += `<br><strong>CO₂ Levels:</strong> ${closestCO2.co2.toFixed(3)}`;
+        }
+
+        // Tooltip position slightly left of line
+        const svgRect = svgLine.node().getBoundingClientRect();
+        let tooltipX = svgRect.left + cx - tooltip.node().offsetWidth + 130;
+        let tooltipY = svgRect.top + cy + window.scrollY - 20;
+
+        // Keep tooltip inside screen
+        const tw = tooltip.node().offsetWidth;
+        const th = tooltip.node().offsetHeight;
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
+        if (tooltipX < 8) tooltipX = 8;
+        if (tooltipY + th > window.scrollY + screenH - 8) tooltipY = window.scrollY + screenH - th - 8;
+        if (tooltipY < window.scrollY + 8) tooltipY = window.scrollY + 8;
+
+        tooltip
+            .style("visibility", "visible")
+            .style("left", tooltipX + "px")
+            .style("top", tooltipY + "px")
+            .html(tooltipHTML);
+    }
+
+    function onOverlayMouseLeave() {
+        tooltip.style("visibility", "hidden");
+        hoverLine.style("visibility", "hidden");
+    }
+
 }
+
+
 
 // Init
 async function init() {
