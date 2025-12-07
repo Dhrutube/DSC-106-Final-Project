@@ -66,6 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
+    const percentChangeData = await d3.csv('data/5YearPercentChange_ByRegion.csv', (row) => ({
+        startYear: +row.startYear,
+        endYear: +row.endYear,
+        region: +row.region,
+        incPerc: +row.increase_percent,
+        decPerc: +row.decrease_percent,
+        stablPerc: +row.stable_percent
+    }));
+
     const heatmapData = await d3.csv('data/heatmapDataWithState.csv', (row) => ({
         ...row,
         year: +row.year,
