@@ -1,4 +1,6 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+let overlayMask;
+let regionMaskData;
 
 document.addEventListener("DOMContentLoaded", () => {
     const pages = document.querySelectorAll(".page");
@@ -48,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                 }     
             }, 200);
-        }, 500); // tiny delay ensures transition is applied properly
+        }, 500);
         const images = next.querySelectorAll(".quadrants-scroll img");
         images.forEach((img) => img.classList.remove("fade-in"));
     }
@@ -69,10 +71,16 @@ async function loadData(){
     const percentChangeData = await d3.csv('data/5YearPercentChange_ByRegion.csv', (row) => ({
         startYear: +row.startYear,
         endYear: +row.endYear,
-        region: +row.region,
+        region: row.region,
         incPerc: +row.increase_percent,
         decPerc: +row.decrease_percent,
         stablPerc: +row.stable_percent
+    }));
+
+    const stateRefData = await d3.csv('data/state_reference_data.csv', row => ({
+        x: +row.x,
+        y: +row.y,
+        region: row.region || null  // store null if NaN
     }));
 
     const heatmapData = await d3.csv('data/heatmapDataWithState.csv', (row) => ({
@@ -81,7 +89,7 @@ async function loadData(){
         x: +row.x,
         y: +row.y,
         value: +row.mean_evi,
-        state: +row.state
+        state: row.state
     }));
 
     const linePlotData = await d3.csv('data/heatmapDataWithState.csv', (row) =>({
@@ -102,7 +110,7 @@ async function loadData(){
         co2: +row['Carbon dioxide']
     }));
 
-    return [heatmapData, linePlotData, droughtData, co2Data];
+    return [percentChangeData, stateRefData, heatmapData, linePlotData, droughtData, co2Data];
 }
 
 function setupStateDropdown(data, selectId = "stateSelect") {
@@ -135,7 +143,6 @@ const svg = d3.select("#viz")
   .attr("width", width)
   .attr("height", height);
 
-// Draw legend
 function drawLegendVertical(colors, startYear) {
     // Remove old legend
     svg.selectAll(".legend").remove();
@@ -196,7 +203,7 @@ function drawLegendVertical(colors, startYear) {
     title.append("tspan")
         .attr("x", 0)
         .attr("dy", 14)
-        .text(`${startYear+4} vs ${startYear}`);
+        .text(`${startYear} -> ${startYear+4}`);
 }
 
 function updateHeatMap(data, startYear) {
@@ -207,14 +214,10 @@ function updateHeatMap(data, startYear) {
     const startData = data.filter(d => d.year == startYear);
     const endData   = data.filter(d => d.year == startYear + 4);
     
-    console.log("startData length:", startData.length);
-    console.log("endData length:", endData.length);
-    
     const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
     const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
 
     const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
-    console.log("Total keys to process:", allKeys.size);
 
     const stats = Array.from(allKeys).map(key => {
         const [x, y] = key.split(',').map(Number);
@@ -238,11 +241,8 @@ function updateHeatMap(data, startYear) {
         };
     });
 
-    // More intuitive thresholds for 0-1 normalized data
-    // These thresholds give you 5 clear categories
     const thresholds = [-0.2, -0.05, 0.05, 0.2];
     
-    // Distinct, intuitive color scheme
     const colors = [
         "#c49a00",  // large decrease
         "#f4c542",  // moderate decrease
@@ -269,7 +269,133 @@ function updateHeatMap(data, startYear) {
     drawLegendVertical(colors, startYear);
 }
 
-var lineMargin = {top: 30, right: 40, bottom: 30, left: 40},
+function getPercByStartYear(data, startYear) {
+    const filtered = data.filter(d => d.startYear === startYear);
+
+    const transformed = filtered.map(d => {
+
+        console.log(
+            `Region ${d.region}: ${d.decPerc}% decrease`
+        );
+
+        return {
+            region: d.region,
+            incPerc: d.incPerc,
+            decPerc: d.decPerc,
+            stablPerc: d.stablPerc
+        };
+    });
+
+    return transformed;
+}
+
+function updateInfoBox(data, startYear, hoveredRegion = null) {
+    const regionData = getPercByStartYear(data, startYear);
+    const displayData = hoveredRegion ? regionData.filter(d => d.region === hoveredRegion) : regionData;
+
+    // Select the container, not the ul
+    const container = d3.select('#info-box-container');
+    
+    // Clear the entire container
+    container.html('');
+    
+    // Add title (outside the ul)
+    container.append('h3')
+        .text('Area (%) With Decrease in Vegetation');
+    
+    // Add instruction (outside the ul)
+    container.append('div')
+        .attr('class', 'instruction')
+        .text('Hover over any boxes below to highlight it on the map');
+
+    // Create the ul for the region list
+    const infoBox = container.append('ul')
+        .attr('id', 'info-box');
+
+    // Bind data to list items
+    const items = infoBox.selectAll('li')
+        .data(displayData.slice(0, 4), d => d.region);
+
+    const newItems = items.enter().append('li');
+
+    newItems.merge(items)
+        .html(d => `
+            <div class="region-name">${d.region}</div>
+            <div class="region-value">${d.decPerc}% 📉</div>
+        `)
+        .each(function(d){
+            // Make the ENTIRE list item hoverable
+            d3.select(this)
+                .on('mouseover', () => {
+                    console.log(`Hovered on ${d.region}`);
+                    dimNonRegionPixels(d.region);
+                })
+                .on('mouseout', () => {
+                    resetOverlay();
+                });
+        });
+
+    items.exit().remove();
+}
+// Function to dim non-region pixels using the overlay mask
+function dimNonRegionPixels(regionName) {
+    if (!regionMaskData) {
+        console.error('regionMaskData is undefined');
+        return;
+    }
+    
+    console.log(`Looking for region: ${regionName}`);
+    console.log(`Total regionMaskData records: ${regionMaskData.length}`);
+    
+    // First, make the entire map semi-transparent #212121
+    overlayMask
+        .transition()
+        .duration(200)
+        .attr("fill", "rgba(33, 33, 33, 0.7)"); // #212121 with 70% opacity
+    
+    // Find all pixels that are NOT in the hovered region
+    const nonRegionPixels = regionMaskData.filter(d => {
+        // Keep pixels that don't belong to any region OR belong to a different region
+        return !d.region || d.region !== regionName;
+    });
+    
+    console.log(`Found ${nonRegionPixels.length} pixels to dim (non-${regionName})`);
+    
+    // Remove any existing dimming rectangles
+    svg.selectAll(".dim-rect").remove();
+    
+    if (nonRegionPixels.length > 0) {
+        // Add dimming rectangles for non-region pixels
+        svg.selectAll(".dim-rect")
+            .data(nonRegionPixels)
+            .enter()
+            .append("rect")
+            .attr("class", "dim-rect")
+            .attr("x", d => (d.x - 1) * cellWidth)
+            .attr("y", d => (d.y - 1) * cellHeight)
+            .attr("width", cellWidth)
+            .attr("height", cellHeight)
+            .attr("fill", "rgba(33, 33, 33, 0.7)") // #212121 with 70% opacity
+            .attr("pointer-events", "none");
+    }
+}
+
+// Reset overlay to transparent
+function resetOverlay() {
+    // Remove the semi-transparent overlay
+    overlayMask
+        .transition()
+        .duration(200)
+        .attr("fill", "transparent");
+    
+    // Remove all dimming rectangles
+    svg.selectAll(".dim-rect").remove();
+    
+    // Remove region borders if they exist
+    svg.selectAll(".region-border").remove();
+}
+
+var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -631,32 +757,40 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
 
 // Init
 async function init() {
-    const [heatmapData, linePlotData, droughtData, co2Data] = await loadData();
+    const [percentChangeData, stateRefData, heatmapData, linePlotData, droughtData, co2Data] = await loadData();
+    regionMaskData = stateRefData
 
     let currentYear = 2000;
-
     // Initial heatmap
     updateHeatMap(heatmapData, currentYear);
+    // Add a single overlay rect
+    overlayMask = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "transparent")
+    .attr("pointer-events", "none")
+    .attr("class", "overlay-mask")
+    .style("z-index", "10");
+
+    updateInfoBox(percentChangeData, currentYear, null);
 
     const timeSlider = document.getElementById('time-slider');
     const selectedTime = document.getElementById("selected-Year-Range");
-    const anyTimeLabel = document.getElementById('any-time');
 
     function updateTimeDisplay(){
         let timeFilter = Number(timeSlider.value);
         
         if (timeFilter === -1){
             selectedTime.textContent = '';
-            anyTimeLabel.style.display = 'block';
         }
         else {
             currentYear = 2000 + timeFilter*5; // Update the current year
             
             selectedTime.textContent = `${currentYear}-${currentYear + 4}`;
-            anyTimeLabel.style.display = 'none';
             
             // Update heatmap with current year
             updateHeatMap(heatmapData, currentYear);
+            updateInfoBox(percentChangeData, currentYear);
         }
     }
 
