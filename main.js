@@ -102,7 +102,71 @@ const svg = d3.select("#viz")
   .attr("height", height);
 
 // Draw legend
-function drawLegendVertical(colors, startYear) {
+// function drawLegendVertical(colors, startYear) {
+//     // Remove old legend
+//     svg.selectAll(".legend").remove();
+
+//     const padding = 10;
+//     const rectWidth = 20;
+//     const rectHeight = 20;
+//     const spacing = 5;
+
+//     // Descriptions for each color
+//     const labels = [
+//         "Large decrease in 🌳",
+//         "Moderate decrease in 🌳",
+//         "Little to no change",
+//         "Moderate increase in 🌳",
+//         "Large increase in 🌳"
+//     ];
+
+//     const legend = svg.append("g")
+//         .attr("class", "legend")
+//         .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
+
+//     legend.selectAll("rect")
+//         .data(colors)
+//         .join("rect")
+//         .attr("x", 0)
+//         .attr("y", (d, i) => i * (rectHeight + spacing))
+//         .attr("width", rectWidth)
+//         .attr("height", rectHeight)
+//         .attr("fill", d => d)
+//         .attr("stroke", "#000");
+
+//     // Draw text labels to the right
+//     legend.selectAll("text")
+//         legend.selectAll("text.legend-label")
+//         .data(labels)
+//         .join("text")
+//         .attr("class", "legend-label")
+//         .attr("x", rectWidth + 5)
+//         .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
+//         .attr("font-size", "12px")
+//         .attr("fill", "white")   
+//         .text(d => d);
+    
+//     const title = legend.append("text")
+//         .attr("class", "legend-title")
+//         .attr("x", 0)
+//         .attr("y", -25)
+//         .attr("font-size", "14px")
+//         .attr("font-weight", "bold")
+//         .attr("fill", "white");
+
+//     // First line
+//     title.append("tspan")
+//         .attr("x", 0)
+//         .text("Difference in Vegetation");
+
+//     // Second line (indented)
+//     title.append("tspan")
+//         .attr("x", 0)     // indent by 10 px — adjust as needed
+//         .attr("dy", 14)    // move down one line
+//         .text(`between ${startYear+1} and ${startYear}`);
+// }
+
+function drawLegendVerticalEnhanced(colors, startYear) {
     // Remove old legend
     svg.selectAll(".legend").remove();
 
@@ -111,13 +175,13 @@ function drawLegendVertical(colors, startYear) {
     const rectHeight = 20;
     const spacing = 5;
 
-    // Descriptions for each color
+    // Numerical ranges for clarity
     const labels = [
-        "Large decrease in 🌳",
-        "Moderate decrease in 🌳",
-        "Little to no change",
-        "Moderate increase in 🌳",
-        "Large increase in 🌳"
+        "Decrease > 20%",
+        "Decrease 5-20%",
+        "Change ±5%",
+        "Increase 5-20%",
+        "Increase > 20%"
     ];
 
     const legend = svg.append("g")
@@ -135,13 +199,12 @@ function drawLegendVertical(colors, startYear) {
         .attr("stroke", "#000");
 
     // Draw text labels to the right
-    legend.selectAll("text")
-        legend.selectAll("text.legend-label")
+    legend.selectAll("text.legend-label")
         .data(labels)
         .join("text")
         .attr("class", "legend-label")
         .attr("x", rectWidth + 5)
-        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
+        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4)
         .attr("font-size", "12px")
         .attr("fill", "white")   
         .text(d => d);
@@ -157,14 +220,15 @@ function drawLegendVertical(colors, startYear) {
     // First line
     title.append("tspan")
         .attr("x", 0)
-        .text("Difference in Vegetation");
+        .text("Vegetation Change");
 
     // Second line (indented)
     title.append("tspan")
-        .attr("x", 0)     // indent by 10 px — adjust as needed
-        .attr("dy", 14)    // move down one line
-        .text(`between ${startYear+1} and ${startYear}`);
+        .attr("x", 0)
+        .attr("dy", 14)
+        .text(`${startYear+1} vs ${startYear}`);
 }
+
 
 // function drawHeatmap(data, startYear, endYear) {
 //     const instruction = document.getElementById("instruction");
@@ -290,6 +354,65 @@ function renderLinePlot(data, startYear) {
 }
 
 // Init
+// function updateHeatMap(data, startYear) {
+//     svg.selectAll("rect").remove();
+//     const startData = data.filter(d => d.year == startYear);
+//     const endData   = data.filter(d => d.year == startYear + 1);
+
+//     const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
+//     const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
+
+//     const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
+
+//     const stats = Array.from(allKeys).map(key => {
+//         const [x, y] = key.split(',').map(Number);
+//         const valStart = startMap.get(key);
+//         const valEnd   = endMap.get(key);
+
+//         let diff = NaN;
+//         let hasMissing = false;
+
+//         if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
+//             hasMissing = true;
+//         } else {
+//             diff = valEnd - valStart;
+//         }
+
+//         return {
+//             xpx: x,
+//             ypx: y,
+//             diff,
+//             hasMissing
+//         };
+//     });   
+
+//     // Dynamic thresholds based on distribution
+//     const thresholds = [-0.4, -0.15, 0.15, 0.4];
+//     const colors = [
+//         "#c49a00",  // large decrease
+//         "#f4c542",  // moderate decrease
+//         "#fff7a0",  // little/no change
+//         "#66c2a5",  // moderate increase
+//         "#006400"   // large increase
+//     ];
+
+//         const colorScale = d3.scaleThreshold()
+//         .domain(thresholds)
+//         .range(colors);
+
+//     // Draw heatmap
+//     svg.selectAll("rect")
+//         .data(stats)
+//         .join("rect")
+//         .attr("x", d => (d.xpx - 1) * cellWidth)
+//         .attr("y", d => (d.ypx - 1) * cellHeight)
+//         .attr("width", cellWidth)
+//         .attr("height", cellHeight)
+//         .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
+    
+//     drawLegendVertical(colors, startYear);
+// }
+
 function updateHeatMap(data, startYear) {
     svg.selectAll("rect").remove();
     const startData = data.filter(d => d.year == startYear);
@@ -320,10 +443,13 @@ function updateHeatMap(data, startYear) {
             diff,
             hasMissing
         };
-    });   
+    });
 
-    // Dynamic thresholds based on distribution
-    const thresholds = [-0.4, -0.15, 0.15, 0.4];
+    // More intuitive thresholds for 0-1 normalized data
+    // These thresholds give you 5 clear categories
+    const thresholds = [-0.2, -0.05, 0.05, 0.2];
+    
+    // Distinct, intuitive color scheme
     const colors = [
         "#c49a00",  // large decrease
         "#f4c542",  // moderate decrease
@@ -332,7 +458,7 @@ function updateHeatMap(data, startYear) {
         "#006400"   // large increase
     ];
 
-        const colorScale = d3.scaleThreshold()
+    const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
 
@@ -346,7 +472,8 @@ function updateHeatMap(data, startYear) {
         .attr("height", cellHeight)
         .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
     
-    drawLegendVertical(colors, startYear);
+    // Update legend labels to be more precise
+    drawLegendVerticalEnhanced(colors, startYear);
 }
 
 
