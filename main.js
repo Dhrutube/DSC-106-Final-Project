@@ -66,13 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
-    const heatmapData = await d3.csv('data/heatmap_data.csv', (row) => ({
+    const heatmapData = await d3.csv('data/heatmapDataWithState.csv', (row) => ({
         ...row,
         year: +row.year,
         x: +row.x,
         y: +row.y,
-        value: +row.value
-  }));
+        value: +row.mean_evi,
+        state: +row.state
+    }));
 
     const linePlotData = await d3.csv('data/heatmapDataWithState.csv', (row) =>({
         ...row,
@@ -93,35 +94,6 @@ async function loadData(){
     }));
 
     return [heatmapData, linePlotData, droughtData, co2Data];
-}
-
-function populateDropdowns(data) {
- // Get unique years from data   
-  const years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
-
-  const startSelect = document.getElementById("startYear");
-  const endSelect = document.getElementById("endYear");
-
-  // Clear existing options
-  startSelect.innerHTML = '';
-  endSelect.innerHTML = '';
-  
-  
-  // Assign repsective years to 1 - 12
-  for (let i = 0; i < years.length; i++){
-    const startOption = new Option(Number(years[i]));
-    const endOption = new Option(Number(years[i]));
-    
-    startSelect.add(startOption);
-    endSelect.add(endOption);
-  };
-  startSelect.value = 2012
-  endSelect.value = 2024
-  
-  let startYear = startSelect.value;
-  let endYear = endSelect.value;
-  
-  return [startYear, endYear];
 }
 
 function setupStateDropdown(data) {
@@ -159,7 +131,7 @@ const svg = d3.select("#viz")
   .attr("height", height);
 
 // Draw legend
-function drawLegendVertical(colors) {
+function drawLegendVertical(colors, startYear) {
     // Remove old legend
     svg.selectAll(".legend").remove();
 
@@ -168,29 +140,19 @@ function drawLegendVertical(colors) {
     const rectHeight = 20;
     const spacing = 5;
 
-    // Descriptions for each color
+    // Numerical ranges for clarity
     const labels = [
-        "Large decrease in 🌳",
-        "Moderate decrease in 🌳",
-        "Little to no change",
-        "Moderate increase in 🌳",
-        "Large increase in 🌳"
+        "Decrease > 20%",
+        "Decrease 5-20%",
+        "Change ±5%",
+        "Increase 5-20%",
+        "Increase > 20%"
     ];
-
-
 
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
-    
-    // legend.append("text")
-    //     .attr("class", "legend-title")
-    //     .attr("x", 0)
-    //     .attr("y", -10)
-    //     .attr("font-size", "14px")
-    //     .attr("font-weight", "bold")
-    //     .text("Diff in Density \nbetween 2024 and 2023");
-    // Draw colored rectangles
+
     legend.selectAll("rect")
         .data(colors)
         .join("rect")
@@ -202,13 +164,12 @@ function drawLegendVertical(colors) {
         .attr("stroke", "#000");
 
     // Draw text labels to the right
-    legend.selectAll("text")
-        legend.selectAll("text.legend-label")
+    legend.selectAll("text.legend-label")
         .data(labels)
         .join("text")
         .attr("class", "legend-label")
         .attr("x", rectWidth + 5)
-        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4) // vertically center
+        .attr("y", (d, i) => i * (rectHeight + spacing) + rectHeight / 2 + 4)
         .attr("font-size", "12px")
         .attr("fill", "white")   
         .text(d => d);
@@ -224,32 +185,31 @@ function drawLegendVertical(colors) {
     // First line
     title.append("tspan")
         .attr("x", 0)
-        .text("Difference in Vegetation");
+        .text("Vegetation Change");
 
     // Second line (indented)
     title.append("tspan")
-        .attr("x", 0)     // indent by 10 px — adjust as needed
-        .attr("dy", 14)    // move down one line
-        .text("between 2024 and 2023");
+        .attr("x", 0)
+        .attr("dy", 14)
+        .text(`${startYear+4} vs ${startYear}`);
 }
 
-
-function drawHeatmap(data, startYear, endYear) {
-    const instruction = document.getElementById("instruction");
-    instruction.innerHTML = '';
-
+function updateHeatMap(data, startYear) {
+    console.log("updateHeatMap called with startYear:", startYear);
+    console.log("Available years in data:", [...new Set(data.map(d => d.year))].sort());
+    
     svg.selectAll("rect").remove();
-
-    // Filter data for the two years
     const startData = data.filter(d => d.year == startYear);
-    const endData   = data.filter(d => d.year == endYear);
-
-    // Build a lookup for fast access by x,y
+    const endData   = data.filter(d => d.year == startYear + 4);
+    
+    console.log("startData length:", startData.length);
+    console.log("endData length:", endData.length);
+    
     const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
     const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
 
-    // Get all unique (x,y) pairs from either year
     const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
+    console.log("Total keys to process:", allKeys.size);
 
     const stats = Array.from(allKeys).map(key => {
         const [x, y] = key.split(',').map(Number);
@@ -273,11 +233,11 @@ function drawHeatmap(data, startYear, endYear) {
         };
     });
 
-    // Filter out missing values for scale
-    // const validDiffs = stats.filter(d => !d.hasMissing).map(d => d.diff);
-
-    // Dynamic thresholds based on distribution
-    const thresholds = [-20, -8, 8, 20]; 
+    // More intuitive thresholds for 0-1 normalized data
+    // These thresholds give you 5 clear categories
+    const thresholds = [-0.2, -0.05, 0.05, 0.2];
+    
+    // Distinct, intuitive color scheme
     const colors = [
         "#c49a00",  // large decrease
         "#f4c542",  // moderate decrease
@@ -285,7 +245,7 @@ function drawHeatmap(data, startYear, endYear) {
         "#66c2a5",  // moderate increase
         "#006400"   // large increase
     ];
-        
+
     const colorScale = d3.scaleThreshold()
         .domain(thresholds)
         .range(colors);
@@ -300,7 +260,8 @@ function drawHeatmap(data, startYear, endYear) {
         .attr("height", cellHeight)
         .attr("fill", d => d.hasMissing ? "#212121" : colorScale(d.diff));
     
-    drawLegendVertical(colors);
+    // Update legend labels to be more precise
+    drawLegendVertical(colors, startYear);
 }
 
 var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
@@ -543,28 +504,43 @@ function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = 
     svgLine.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels").attr("fill", "white");
 }
 
-
-
 // Init
 async function init() {
     const [heatmapData, linePlotData, droughtData, co2Data] = await loadData();
-    const [startYear, endYear] = populateDropdowns(heatmapData);
 
-    const updateButton = document.getElementById("updateButton");
-    if (updateButton) {
-        updateButton.onclick = () => {
-            const startYear = parseInt(document.getElementById("startYear").value);
-            const endYear = parseInt(document.getElementById("endYear").value);
+    let currentYear = 2000;
+
+    // Initial heatmap
+    updateHeatMap(heatmapData, currentYear);
+
+    const timeSlider = document.getElementById('time-slider');
+    const selectedTime = document.getElementById("selected-Year-Range");
+    const anyTimeLabel = document.getElementById('any-time');
+
+    function updateTimeDisplay(){
+        let timeFilter = Number(timeSlider.value);
+        
+        if (timeFilter === -1){
+            selectedTime.textContent = '';
+            anyTimeLabel.style.display = 'block';
+        }
+        else {
+            currentYear = 2000 + timeFilter*5; // Update the current year
             
-            if (startYear > endYear) {
-            alert("Start month must be before end month");
-            return;
-            }
-
-            svg.selectAll("*").remove();
-            drawHeatmap(heatmapData, startYear, endYear)
-        };
+            selectedTime.textContent = `${currentYear}-${currentYear + 4}`;
+            anyTimeLabel.style.display = 'none';
+            
+            // Update heatmap with current year
+            updateHeatMap(heatmapData, currentYear);
+        }
     }
+
+    timeSlider.addEventListener('input', updateTimeDisplay);
+    
+    // Set initial display
+    timeSlider.value = "0"; // Show 2000-2004 initially
+    updateTimeDisplay();
+    
     setupStateDropdown(linePlotData);
     document.getElementById("stateSelect").onchange = (e) => {
         // Reset checkboxes
@@ -578,3 +554,4 @@ async function init() {
 }
 
 init() 
+

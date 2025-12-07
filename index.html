@@ -33,27 +33,27 @@
         and there would be minimal difference in vegetation density</h2>
         <p>... but because climate change affects the seasons, there is a visible difference in vegetation density between years. But is this really the case?</p>
           
-          <!-- Newly added -->
-          <div class="controls">
-            <div class="item"><label for="startYear" >Start Year:</label></div>
-            <div class="item"><select id="startYear"></select></div>
-            <div class="item"><label for="endYear">End Year:</label></div>
-            <div class="item"><select id="endYear"></select></div>
-            <div class="item"><button id="updateButton">Update Heatmap</button></div>
-          </div>
+        <header>
+          <label>
+              <p><i>Scroll to see the degree of change over 25 years</i></p>
+              <input id="time-slider" type="range" min="0" max="4" value = "0">
+          </label>
+        </header>
+
+        <p>
+          <em id="any-time">(any year)</em>
+          <time id="selected-Year-Range">2000-2004</time>
+        </p>
+
           <div class="heatmapDisplay">
-            <div id="viz">
-              <div id="instruction">
-                Select the start and end year for comparison to see the change in density.
-              </div>
-            </div>
+            <div id="viz"></div>
             <div id="legend"></div>
           </div>
 
         <p>The above is the change in density (normalized vegetation) between the summer of 2023 and 2024. <br>
           For reference, the greatest possible absolute change is 2. In this case, we see a noticeable decline in vegetation.</p>
 
-      </div>
+      </div>v
 
       <div class="page">
         <h2>During the summer months, the vegetation density has been volatile year by year</h2>
