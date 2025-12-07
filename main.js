@@ -247,7 +247,6 @@ function updateHeatMap(data, startYear) {
 
     const thresholds = [-0.2, -0.05, 0.05, 0.2];
     
-    // Distinct, intuitive color scheme
     const colors = [
         "#c49a00",  // large decrease
         "#f4c542",  // moderate decrease
@@ -298,13 +297,28 @@ function updateInfoBox(data, startYear, hoveredRegion = null) {
     const regionData = getPercByStartYear(data, startYear);
     const displayData = hoveredRegion ? regionData.filter(d => d.region === hoveredRegion) : regionData;
 
-    const infoBox = d3.select('#info-box');
+    // Select the container, not the ul
+    const container = d3.select('#info-box-container');
+    
+    // Clear the entire container
+    container.html('');
+    
+    // Add title (outside the ul)
+    container.append('h3')
+        .text('Area (%) With Decrease in Vegetation');
+    
+    // Add instruction (outside the ul)
+    container.append('div')
+        .attr('class', 'instruction')
+        .text('Hover over any boxes below to highlight it on the map');
 
-    // Bind data
+    // Create the ul for the region list
+    const infoBox = container.append('ul')
+        .attr('id', 'info-box');
+
+    // Bind data to list items
     const items = infoBox.selectAll('li')
         .data(displayData.slice(0, 4), d => d.region);
-
-    items.exit().remove();
 
     const newItems = items.enter().append('li');
 
@@ -314,17 +328,19 @@ function updateInfoBox(data, startYear, hoveredRegion = null) {
             <div class="region-value">${d.decPerc}% 📉</div>
         `)
         .each(function(d){
-            d3.select(this).select('.region-name')
+            // Make the ENTIRE list item hoverable
+            d3.select(this)
                 .on('mouseover', () => {
                     console.log(`Hovered on ${d.region}`);
-                    dimNonRegionPixels(d.region); // No parameter needed now
+                    dimNonRegionPixels(d.region);
                 })
                 .on('mouseout', () => {
                     resetOverlay();
                 });
         });
-}
 
+    items.exit().remove();
+}
 // Function to dim non-region pixels using the overlay mask
 function dimNonRegionPixels(regionName) {
     if (!regionMaskData) {
