@@ -162,7 +162,7 @@ p.bottom {
   margin-bottom: 30px;
 }
 
-#lineTooltip {
+#lineTooltip, #lineTooltipExtended{
     position: fixed;
     padding: 6px 10px;
     background: rgba(0, 0, 0, 0.8);
