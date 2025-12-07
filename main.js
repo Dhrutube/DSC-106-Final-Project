@@ -105,18 +105,14 @@ async function loadData(){
     return [heatmapData, linePlotData, droughtData, co2Data];
 }
 
-function setupStateDropdown(data) {
-    const select = document.getElementById("stateSelect");
+function setupStateDropdown(data, selectId = "stateSelect") {
+    const select = document.getElementById(selectId);
 
-    // List of states in the dataset
     const states = Array.from(new Set(data.map(d => d.state))).sort();
 
     select.innerHTML = "";
-
-    // Always add "US" option first
     select.append(new Option("United States", "US"));
 
-    // Add states
     states.forEach(state => {
         select.append(new Option(state, state));
     });
@@ -634,6 +630,17 @@ async function init() {
         // redraw line plot
         renderLinePlot(linePlotData, e.target.value, droughtData, co2Data);
     };
+    setupStateDropdown(linePlotData, "stateSelectExtended");
+    document.getElementById("stateSelectExtended").onchange = (e) => {
+        // Reset checkboxes
+        d3.select("#toggleDroughtExtended").property("checked", false);
+        d3.select("#toggleCO2Extended").property("checked", false);
+
+        // redraw extended line plot for selected state
+        renderLinePlot(linePlotData, e.target.value, droughtData, co2Data, 2000, 2022, "lineVizExtended", "lineTooltipExtended",
+            "toggleDroughtExtended", "toggleCO2Extended");
+    };
+
     renderLinePlot(linePlotData, "US", droughtData, co2Data);
     renderLinePlot(linePlotData, "US", droughtData, co2Data, 2000, 2022, "lineVizExtended", "lineTooltipExtended", 
         "toggleDroughtExtended","toggleCO2Extended");
