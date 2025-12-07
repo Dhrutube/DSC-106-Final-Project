@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                 }     
             }, 200);
-        }, 500); // tiny delay ensures transition is applied properly
+        }, 500);
         const images = next.querySelectorAll(".quadrants-scroll img");
         images.forEach((img) => img.classList.remove("fade-in"));
     }
