@@ -65,11 +65,30 @@
         </div>
         <div class="linePlotDisplay">
           <div id="lineViz"></div>
+          <div id="linePlotCitation" class="linePlotCitation">
+            Data sources: 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-us-greenhouse-gas-emissions/index.html" target="_blank">
+              EPA, U.S. Greenhouse Gas Emissions
+            </a>, 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-drought/index.html" target="_blank">
+              EPA, Drought
+            </a>
+          </div>
         </div>
-        <label class="linePlotLabel">
-          <input type="checkbox" id="toggleDrought"> Show Drought Line
-          <input type="checkbox" id="toggleCO2"> Show CO₂ Line
-        </label>
+        <div class="linePlotLabel">
+          <label>
+            <input type="checkbox" id="toggleDrought"> Show Drought Line
+          </label>
+          <label>
+            <input type="checkbox" id="toggleCO2"> Show CO₂ Line
+          </label>
+        </div>
+        <p>The reason the vegetation density is this volatile is due to a combination of droughts and elevated levels of CO2. <br>
+          Droughts is obvious, less water means plants will slowly start wilt and eventually die, but CO2 is not as obvious as you may think. <br>
+          CO2 is a necessary component to photosynthesis, meaning more CO2 would lead to more photosynthesis and more plants right? <br>
+          Not quite. Although more CO2 does generally have a positive effect on plants, plants are limited by other nutrients they have to compete for. <br>
+          It is also a greenhouse gas, which also feeds into increased temperatures and droughts, leading to volatile vegetation density.
+        </p>
       </div>
 
       <div class="page">
