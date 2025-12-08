@@ -404,21 +404,6 @@ function setupStateDropdown(data, selectId = "stateSelect") {
     });
 }
 
-// ############### Line Graphs ###############
-
-function setupStateDropdown(data, selectId = "stateSelect") {
-    const select = document.getElementById(selectId);
-
-    const states = Array.from(new Set(data.map(d => d.state))).sort();
-
-    select.innerHTML = "";
-    select.append(new Option("United States", "US"));
-
-    states.forEach(state => {
-        select.append(new Option(state, state));
-    });
-}
-
 var lineMargin = {top: 20, right: 100, bottom: 30, left: 60},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
