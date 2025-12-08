@@ -404,7 +404,7 @@ function setupStateDropdown(data, selectId = "stateSelect") {
     });
 }
 
-var lineMargin = {top: 20, right: 100, bottom: 30, left: 60},
+var lineMargin = {top: 35, right: 100, bottom: 60, left: 60},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -699,7 +699,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     svgLineLocal.append("text")
         .attr("class", "plotTitle")
         .attr("x", lineWidth / 2)
-        .attr("y", -5)
+        .attr("y", -20)
         .attr("text-anchor", "middle")
         .attr("font-size", "18px")
         .attr("font-weight", "bold")

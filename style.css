@@ -142,9 +142,7 @@ Map images
   }
 }
 
-/*
-State drop down
-*/
+/* ================================= Vegetation Density Line Viz Dropdown */
 
 .stateControls {
   display: flex;
@@ -313,10 +311,16 @@ Line plot
   cursor: pointer;
 }
 
+/* ================================= Viz Margin Adjustment  */
 .heatmapDisplay {
   margin-bottom: 10px;
 }
 
+.linePlotDisplay {
+  margin-bottom: 20px;
+}
+
+/* ================================= Heatmap info box  */
 /* Info Box Container */
 #info-box-container {
     background-color: rgba(33, 33, 33, 0.8);
@@ -327,7 +331,7 @@ Line plot
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-/* Region List - SINGLE ROW with horizontal alignment inside each box */
+/* Region List */
 #info-box {
     list-style: none;
     padding: 0;
@@ -337,7 +341,6 @@ Line plot
     gap: 10px;
 }
 
-/* Region List Items - horizontal alignment inside */
 #info-box li {
     display: flex;
     justify-content: space-between; /* Name left, value right */
@@ -352,7 +355,6 @@ Line plot
     min-height: 45px;
 }
 
-/* Region Name */
 #info-box li .region-name {
     font-weight: bold;
     color: #fff;
@@ -360,7 +362,6 @@ Line plot
     margin-right: 15px; /* Space between name and value */
 }
 
-/* Region Value */
 #info-box li .region-value {
     color: #ff6b6b;
     font-weight: bold;
@@ -368,6 +369,7 @@ Line plot
     white-space: nowrap;
 }
 
+/* ================================= Overlay masking when hover  */
 .region-overlay {
     position: absolute;
     top: 0; left: 0;
@@ -383,6 +385,7 @@ Line plot
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
+/* ================================= More heatmap info box adjustment  */
 #info-box h3 {
     margin: 0 0 12px 0;
     color: #fff;
@@ -396,9 +399,7 @@ Line plot
 #info-box {
     padding: 24px 32px;
     border-radius: 12px;
-    /* box-shadow: 0 4px 12px rgba(0,0,0,0.5); */
     color: #fff;
     width: auto;
     max-width: 100%;
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
 }
