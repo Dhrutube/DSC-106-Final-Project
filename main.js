@@ -658,7 +658,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("fill", "none")
         .attr("stroke", "#71ffd9ff")
         .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "5 2")
+        .attr("stroke-dasharray", "6 6")
         .style("visibility", "hidden")
         .attr("d", co2Line);
 
@@ -669,7 +669,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
             .attr("fill", "none")
             .attr("stroke", "#71ffd9ff")
             .attr("stroke-width", 6)
-            .attr("stroke-dasharray", "5 2")
+            .attr("stroke-dasharray", "6 6")
             .style("visibility", "hidden")
             .attr("d", co2Line);
     }
@@ -730,14 +730,66 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     });
 
     // ----- LEGEND -----
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#47e664ff");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 25).text("Vegetation Density").attr("fill", "white");
+    const legend = svgLineLocal.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(0, 0)");
 
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 50).text("Drought Index (U.S. Total)").attr("fill", "white");
+    // EVI legend
+    const eviLegend = legend.append("g").attr("transform", "translate(0, 0)");
 
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels (U.S. Total)").attr("fill", "white");
+    eviLegend.append("line")
+        .attr("x1", 0)
+        .attr("x2", 20)
+        .attr("y1", 15)
+        .attr("y2", 15)
+        .attr("stroke", "#47e664ff")
+        .attr("stroke-width", 3)
+        .attr("stroke-dasharray", "none");   
+
+    eviLegend.append("text")
+        .attr("x", 30)
+        .attr("y", 20)
+        .attr("fill", "white")
+        .text("Vegetation Density");
+
+
+    // Drought legend
+    const droughtLegend = legend.append("g").attr("transform", "translate(0, 30)");
+
+    droughtLegend.append("line")
+        .attr("x1", 0)
+        .attr("x2", 20)
+        .attr("y1", 15)
+        .attr("y2", 15)
+        .attr("stroke", "#ffcc00")
+        .attr("stroke-width", 3)
+        .attr("stroke-dasharray", "4 2");   
+
+    droughtLegend.append("text")
+        .attr("x", 30)
+        .attr("y", 20)
+        .attr("fill", "white")
+        .text("Drought Index (U.S. Total)");
+
+
+    // CO2 legend
+    const co2Legend = legend.append("g").attr("transform", "translate(0, 60)");
+
+    co2Legend.append("line")
+        .attr("x1", 0)
+        .attr("x2", 20)
+        .attr("y1", 15)
+        .attr("y2", 15)
+        .attr("stroke", "#71ffd9ff")
+        .attr("stroke-width", 3)
+        .attr("stroke-dasharray", "6 6");
+
+    co2Legend.append("text")
+        .attr("x", 30)
+        .attr("y", 20)
+        .attr("fill", "white")
+        .text("CO₂ Levels (U.S. Total)");
+
 
     // ----- TOOLTIP -----
     const tooltip = d3.select(`#${tooltipId}`);
