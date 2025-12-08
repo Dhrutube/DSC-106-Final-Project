@@ -2,10 +2,12 @@ import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 let overlayMask;
 let regionMaskData;
 
+// Listen to arrow clicks
 document.addEventListener("DOMContentLoaded", () => {
     const pages = document.querySelectorAll(".page");
     let index = 0;
 
+    // Hide arrows if on first/last page
     function updateArrows() {
         const left = document.getElementById("left-arrow");
         const right = document.getElementById("right-arrow");
@@ -67,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateArrows();
 });
 
+// Import in data from CSVs
 async function loadData(){
     const percentChangeData = await d3.csv('data/5YearPercentChange_ByRegion.csv', (row) => ({
         startYear: +row.startYear,
@@ -113,6 +116,7 @@ async function loadData(){
     return [percentChangeData, stateRefData, heatmapData, linePlotData, droughtData, co2Data];
 }
 
+// Populate state dropdowns for line plots
 function setupStateDropdown(data, selectId = "stateSelect") {
     const select = document.getElementById(selectId);
 
@@ -132,8 +136,6 @@ const height = 256 * scale;  // 512
 
 const gridSizeX = 512;   // number of unique x pixels
 const gridSizeY = 256;   // number of unique y pixels
-
-const cellSize = 1;      // if you draw full resolution
 
 const cellWidth = width / gridSizeX;  // = 1 px
 const cellHeight = height / gridSizeY; // = 1 px
@@ -337,6 +339,7 @@ function updateInfoBox(data, startYear, hoveredRegion = null) {
 
     items.exit().remove();
 }
+
 // Function to dim non-region pixels using the overlay mask
 function dimNonRegionPixels(regionName) {
     if (!regionMaskData) {
@@ -416,6 +419,7 @@ function updateActiveLine({ active, selectedState, containerId }) {
 
     const title = svg.select(".plotTitle");
 
+    // Update visible line and right axis
     if (active === "drought") {
         svg.selectAll(".drought-line").style("visibility", "visible");
         svg.select(".yAxisDrought").style("visibility", "visible");
@@ -440,6 +444,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     const svgLineContainer = d3.select(`#${containerId}`);
     svgLineContainer.selectAll("*").remove();
 
+    // Select svg container
     const svgLineLocal = svgLineContainer
         .append("svg")
         .attr("width", lineWidth + lineMargin.left + lineMargin.right)
@@ -464,13 +469,14 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         ).map(([year, density]) => ({ year, density }));
     }
 
+    // Filter by year values
     grouped.sort((a, b) => a.year - b.year);
     grouped = grouped.filter(d => d.year >= minYear && d.year <= maxYear);
     droughtData = droughtData.filter(d => d.year >= minYear && d.year <= maxYear);
     co2Data = co2Data.filter(d => d.year >= minYear && d.year <= maxYear);
 
     // ----- SCALES -----
-    // X scale (restricted to 2000–2015)
+    // X scale 
     const x = d3.scaleLinear()
         .domain([minYear, maxYear])
         .range([0, lineWidth]);
@@ -506,7 +512,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("x", -40)
         .attr("y", -10);
 
-    // drought
+    // Drought
     svgLineLocal.append("g")
         .attr("transform", `translate(${lineWidth}, 0)`)
         .call(d3.axisRight(yRight))
@@ -551,7 +557,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .text("Mean Vegetation Density (EVI)");
 
     // Right Y-axis label for Drought
-    const droughtLabel = svgLineLocal.append("text")
+    svgLineLocal.append("text")
         .attr("class", "yAxisLabelDrought")
         .attr("transform", "rotate(-90)")
         .attr("x", -lineHeight / 2)
@@ -563,7 +569,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .style("visibility", "hidden"); // initially hidden
 
     // Right Y-axis label for CO2
-    const co2Label = svgLineLocal.append("text")
+    svgLineLocal.append("text")
         .attr("class", "yAxisLabelCO2")
         .attr("transform", "rotate(-90)")
         .attr("x", -lineHeight / 2)
@@ -575,7 +581,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .style("visibility", "hidden"); // initially hidden
         
     // ----- LINES -----
-    // Split EVI, drought, and CO2 data
+    // Split EVI, drought, and CO2 data to pre and post 2015
     const groupedPre2015 = grouped.filter(d => d.year <= 2015);
     const groupedPost2015 = grouped.filter(d => d.year >= 2015);
 
@@ -662,7 +668,8 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
             .attr("d", co2Line);
     }
 
-    const overlay = svgLineLocal.append("rect")
+    // Rectangle for tooltip functionality
+    svgLineLocal.append("rect")
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", lineWidth)
@@ -682,7 +689,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("stroke-dasharray", "4 4")
         .style("visibility", "hidden");
 
-    // plot title
+    // Plot title
     svgLineLocal.append("text")
         .attr("class", "plotTitle")
         .attr("x", lineWidth / 2)
@@ -733,7 +740,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         const [mouseX] = d3.pointer(event, this);
         const year = Math.round(x.invert(mouseX));
 
-        // --- Snap to nearest EVI point ---
+        // Snap to nearest EVI point 
         const closestEVI = grouped.reduce((a, b) =>
             Math.abs(b.year - year) < Math.abs(a.year - year) ? b : a
         );
@@ -763,13 +770,11 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
 
         // Tooltip position slightly left of line
         const svgRect = svgLineLocal.node().getBoundingClientRect();
-        let tooltipX = svgRect.left + cx - tooltip.node().offsetWidth + 130;
+        let tooltipX = svgRect.left + cx - tooltip.node().offsetWidth + 50;
         let tooltipY = svgRect.top + cy + window.scrollY - 20;
 
         // Keep tooltip inside screen
-        const tw = tooltip.node().offsetWidth;
         const th = tooltip.node().offsetHeight;
-        const screenW = window.innerWidth;
         const screenH = window.innerHeight;
         if (tooltipX < 8) tooltipX = 8;
         if (tooltipY + th > window.scrollY + screenH - 8) tooltipY = window.scrollY + screenH - th - 8;
@@ -834,6 +839,7 @@ async function init() {
     timeSlider.value = "0"; // Show 2000-2004 initially
     updateTimeDisplay();
     
+    // First line plot
     setupStateDropdown(linePlotData);
     document.getElementById("stateSelect").onchange = (e) => {
         // Reset checkboxes
@@ -843,6 +849,7 @@ async function init() {
         // redraw line plot
         renderLinePlot(linePlotData, e.target.value, droughtData, co2Data);
     };
+    // Second line plot
     setupStateDropdown(linePlotData, "stateSelectExtended");
     document.getElementById("stateSelectExtended").onchange = (e) => {
         // Reset checkboxes
@@ -854,6 +861,7 @@ async function init() {
             "toggleDroughtExtended", "toggleCO2Extended");
     };
 
+    // Initialize line plots
     renderLinePlot(linePlotData, "US", droughtData, co2Data);
     renderLinePlot(linePlotData, "US", droughtData, co2Data, 2000, 2022, "lineVizExtended", "lineTooltipExtended", 
         "toggleDroughtExtended","toggleCO2Extended");
