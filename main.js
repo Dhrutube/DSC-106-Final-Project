@@ -401,22 +401,7 @@ function setupStateDropdown(data, selectId = "stateSelect") {
     });
 }
 
-// ############### Line Graphs ###############
-
-function setupStateDropdown(data, selectId = "stateSelect") {
-    const select = document.getElementById(selectId);
-
-    const states = Array.from(new Set(data.map(d => d.state))).sort();
-
-    select.innerHTML = "";
-    select.append(new Option("United States", "US"));
-
-    states.forEach(state => {
-        select.append(new Option(state, state));
-    });
-}
-
-var lineMargin = {top: 20, right: 100, bottom: 30, left: 60},
+var lineMargin = {top: 35, right: 100, bottom: 60, left: 60},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -707,7 +692,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     svgLineLocal.append("text")
         .attr("class", "plotTitle")
         .attr("x", lineWidth / 2)
-        .attr("y", -5)
+        .attr("y", -20)
         .attr("text-anchor", "middle")
         .attr("font-size", "18px")
         .attr("font-weight", "bold")
@@ -738,14 +723,14 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     });
 
     // ----- LEGEND -----
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 20).attr("r", 6).style("fill", "#47e664ff");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 25).text("Vegetation Density").attr("fill", "white");
+    svgLineLocal.append("circle").attr("cx", 20).attr("cy", 20).attr("r", 6).style("fill", "#47e664ff");
+    svgLineLocal.append("text").attr("x", 35).attr("y", 25).text("Vegetation Density").attr("fill", "white");
 
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 50).text("Drought Index (U.S. Total)").attr("fill", "white");
+    svgLineLocal.append("circle").attr("cx", 20).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
+    svgLineLocal.append("text").attr("x", 35).attr("y", 50).text("Drought Index (U.S. Total)").attr("fill", "white");
 
-    svgLineLocal.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels (U.S. Total)").attr("fill", "white");
+    svgLineLocal.append("circle").attr("cx", 20).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
+    svgLineLocal.append("text").attr("x", 35).attr("y", 75).text("CO₂ Levels (U.S. Total)").attr("fill", "white");
 
     // ----- TOOLTIP -----
     const tooltip = d3.select(`#${tooltipId}`);
