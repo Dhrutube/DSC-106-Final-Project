@@ -95,7 +95,7 @@ body {
   pointer-events: none;
 }
 
-.page:first-child {
+.page:first-child, .page:nth-last-child(2) {
   display: flex !important;
   flex-direction: column;
   justify-content: center !important;
