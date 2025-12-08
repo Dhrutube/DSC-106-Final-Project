@@ -1,3 +1,7 @@
+/* 
+General text CSS 
+*/
+
 body {
   margin: 0;
   padding: 0;
@@ -8,13 +12,202 @@ body {
   overflow: hidden;
 }
 
-/* ================================= Heatmap slider  */
+p.bottom {
+  margin-bottom: 30px;
+}
+
+/* 
+Page CSS 
+*/
 
 #slider-container {
     width: 100%;
     display: flex;
     justify-content: center;
     margin: 20px 0;
+}
+
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.page:first-child, .page:nth-last-child(2) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center;
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden;       
+
+  h1 {
+    font-size: 45px;
+  }
+}
+
+.page:not(:first-child) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;  
+  padding-top: 10px;
+  height: 100%; 
+
+  h2 {
+    margin-bottom: 0;
+  }
+}
+
+.page.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Wipe overlay */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.5s ease-in-out;
+  pointer-events: none;
+}
+
+/* Trigger wipe-out animation */
+.page.wipe-out::after {
+  clip-path: inset(0 0 0 0); 
+}
+
+/* 
+Arrows 
+*/
+
+#left-arrow, #right-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  cursor: pointer;
+  color: #444;
+  padding: 10px;
+  user-select: none;
+  z-index: 1000;
+}
+#left-arrow { left: 20px; }
+#right-arrow { right: 20px; }
+#left-arrow:hover, #right-arrow:hover { color: black; }
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/*
+Map images
+*/
+
+.quadrants-scroll {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 70%;
+  gap: 10px;
+  overflow: visible;
+  margin-bottom: 50px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  img.fade-in {
+    opacity: 1;
+  }
+}
+
+/* ================================= Vegetation Density Line Viz */
+
+.stateControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0 25px 0;
+}
+
+.stateControls label {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.stateControls select {
+  padding: 0.5rem;
+  border: 1px solid oklch(80% 3% 200);
+  background: white;
+  color: black;
+  border-radius: 6px;
+  font-size: 15px;
+  min-width: 180px;
+  cursor: pointer;
+}
+
+/*
+Line plot
+*/
+
+.linePlotCitation {
+  font-size: 12px;
+  color: #ccc;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.linePlotCitation a {
+  color: #47e664ff;
+  text-decoration: none;
+}
+
+.linePlotCitation a:hover {
+  text-decoration: underline;
+}
+
+.linePlotFootnote {
+  font-size: 0.85em;
+  color: #cbcbcb;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+#lineTooltip, #lineTooltipExtended{
+    position: fixed;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.linePlotDisplay {
+  margin-bottom: 20px;
 }
 
 .slider-wrapper {
@@ -81,185 +274,6 @@ body {
     text-align: center;
 }
 
-/* ================================= Page Transition  */
-
-.page {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow-y: auto;
-  padding-bottom: 20px;
-  box-sizing: border-box;
-
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-.page:first-child, .page:nth-last-child(2) {
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center;
-  padding: 0 !important;
-  height: 100%;
-  overflow: hidden;       
-
-  h1 {
-    font-size: 45px;
-  }
-}
-
-.page:not(:first-child) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;  
-  text-align: center;  
-  padding-top: 10px;
-  height: 100%; 
-
-  h2 {
-    margin-bottom: 0;
-  }
-}
-
-.page.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Wipe overlay */
-.page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: white;
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.5s ease-in-out;
-  pointer-events: none;
-}
-
-/* Trigger wipe-out animation */
-.page.wipe-out::after {
-  clip-path: inset(0 0 0 0); 
-}
-
-/* Arrows */
-#left-arrow, #right-arrow {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 60px;
-  cursor: pointer;
-  color: #444;
-  padding: 10px;
-  user-select: none;
-  z-index: 1000;
-}
-#left-arrow { left: 20px; }
-#right-arrow { right: 20px; }
-#left-arrow:hover, #right-arrow:hover { color: black; }
-
-.hidden {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.quadrants-scroll {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 70%;
-  gap: 10px;
-  overflow: visible;
-  margin-bottom: 50px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: flex;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-  img.fade-in {
-    opacity: 1;
-  }
-}
-
-/* ================================= Vegetation Density Line Viz */
-
-.stateControls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 15px 0 25px 0;
-}
-
-.stateControls label {
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.stateControls select {
-  padding: 0.5rem;
-  border: 1px solid oklch(80% 3% 200);
-  background: white;
-  color: black;
-  border-radius: 6px;
-  font-size: 15px;
-  min-width: 180px;
-  cursor: pointer;
-}
-
-.linePlotCitation {
-  font-size: 12px;
-  color: #ccc;
-  text-align: center;
-  margin-top: 5px;
-}
-
-.linePlotCitation a {
-  color: #47e664ff;
-  text-decoration: none;
-}
-
-.linePlotCitation a:hover {
-  text-decoration: underline;
-}
-
-p.bottom {
-  margin-bottom: 30px;
-}
-
-.linePlotFootnote {
-  font-size: 0.85em;
-  color: #cbcbcb;
-  margin-top: 4px;
-  font-style: italic;
-}
-
-#lineTooltip, #lineTooltipExtended{
-    position: fixed;
-    padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    border-radius: 4px;
-    font-size: 12px;
-    pointer-events: none;
-    visibility: hidden;
-    transition: opacity 0.1s ease-in-out;
-}
-
-.tooltip-overlay {
-    fill: none;
-    pointer-events: all;
-}
-
 .controls {
   display: flex;
   border-bottom-width: 1px;
@@ -278,11 +292,6 @@ p.bottom {
   text-align: center;  
   padding-top: 10px;
   height: 100%; 
-}
-
-.page.active {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .controls select {
