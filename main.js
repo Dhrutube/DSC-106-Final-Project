@@ -401,7 +401,22 @@ function setupStateDropdown(data, selectId = "stateSelect") {
     });
 }
 
-var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
+// ############### Line Graphs ###############
+
+function setupStateDropdown(data, selectId = "stateSelect") {
+    const select = document.getElementById(selectId);
+
+    const states = Array.from(new Set(data.map(d => d.state))).sort();
+
+    select.innerHTML = "";
+    select.append(new Option("United States", "US"));
+
+    states.forEach(state => {
+        select.append(new Option(state, state));
+    });
+}
+
+var lineMargin = {top: 20, right: 100, bottom: 30, left: 60},
     lineWidth = 960 - lineMargin.left - lineMargin.right,
     lineHeight = 500 - lineMargin.top - lineMargin.bottom;
 
@@ -409,37 +424,27 @@ let activeLine = null;
 
 function updateActiveLine({ active, selectedState, containerId }) {
     activeLine = active;
-    // Select SVG inside the container
     const svg = d3.select(`#${containerId} svg`);
 
     // Hide all lines & axes first
     svg.selectAll(".drought-line").style("visibility", "hidden");
     svg.select(".yAxisDrought").style("visibility", "hidden");
+    svg.select(".yAxisLabelDrought").style("visibility", "hidden"); 
 
     svg.selectAll(".co2-line").style("visibility", "hidden");
     svg.select(".yAxisCO2").style("visibility", "hidden");
+    svg.select(".yAxisLabelCO2").style("visibility", "hidden"); 
 
-    // Update title
     const title = svg.select(".plotTitle");
 
     if (active === "drought") {
         svg.selectAll(".drought-line").style("visibility", "visible");
         svg.select(".yAxisDrought").style("visibility", "visible");
-
-        title.text(
-            selectedState === "US"
-                ? "Mean Vegetation Density and Drought Index for the United States"
-                : `Mean Vegetation Density and Drought Index for ${selectedState}`
-        );
+        svg.select(".yAxisLabelDrought").style("visibility", "visible"); 
     } else if (active === "co2") {
         svg.selectAll(".co2-line").style("visibility", "visible");
         svg.select(".yAxisCO2").style("visibility", "visible");
-
-        title.text(
-            selectedState === "US"
-                ? "Mean Vegetation Density and CO₂ Levels for the United States"
-                : `Mean Vegetation Density and CO₂ Levels for ${selectedState}`
-        );
+        svg.select(".yAxisLabelCO2").style("visibility", "visible"); 
     } else {
         title.text(
             selectedState === "US"
@@ -448,6 +453,7 @@ function updateActiveLine({ active, selectedState, containerId }) {
         );
     }
 }
+
 
 function renderLinePlot(data, selectedState = "US", droughtData = [], co2Data = [], minYear = 2000, maxYear = 2015, 
 containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleDrought', co2CheckboxId = 'toggleCO2') {
@@ -519,8 +525,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .append("text")
         .attr("fill", "white")
         .attr("x", -40)
-        .attr("y", -10)
-        .text("Mean Vegetation Density");
+        .attr("y", -10);
 
     // drought
     svgLineLocal.append("g")
@@ -531,8 +536,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .append("text")
         .attr("fill", "white")
         .attr("x", 40)
-        .attr("y", -10)
-        .text("Drought Index");
+        .attr("y", -10);
 
     // CO2
     svgLineLocal.append("g")
@@ -543,23 +547,141 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .append("text")
         .attr("fill", "white")
         .attr("x", 40)
-        .attr("y", -10)
-        .text("CO₂ Levels");
+        .attr("y", -10);
 
+    // ----- LABELS -----
+    // X-axis label
+    svgLineLocal.append("text")
+        .attr("class", "axis-label")
+        .attr("x", lineWidth / 2)
+        .attr("y", lineHeight + lineMargin.bottom - 5)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", 14)
+        .text("Year");
+
+    // Left Y-axis label
+    svgLineLocal.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -lineHeight / 2)
+        .attr("y", -lineMargin.left + 15)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .attr("font-size", 14)
+        .text("Mean Vegetation Density (EVI)");
+
+    // Right Y-axis label for Drought
+    const droughtLabel = svgLineLocal.append("text")
+        .attr("class", "yAxisLabelDrought")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -lineHeight / 2)
+        .attr("y", lineWidth + lineMargin.right - 55)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#ffcc00")
+        .attr("font-size", 14)
+        .text("Drought Index (U.S. Total)")
+        .style("visibility", "hidden"); // initially hidden
+
+    // Right Y-axis label for CO2
+    const co2Label = svgLineLocal.append("text")
+        .attr("class", "yAxisLabelCO2")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -lineHeight / 2)
+        .attr("y", lineWidth + lineMargin.right - 45)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#71ffd9ff")
+        .attr("font-size", 14)
+        .text("CO₂ Levels (U.S. Total)")
+        .style("visibility", "hidden"); // initially hidden
+        
     // ----- LINES -----
-    // EVI line
+    // Split EVI, drought, and CO2 data
+    const groupedPre2015 = grouped.filter(d => d.year <= 2015);
+    const groupedPost2015 = grouped.filter(d => d.year >= 2015);
+
+    const droughtPre2015 = droughtData.filter(d => d.year <= 2015);
+    const droughtPost2015 = droughtData.filter(d => d.year >= 2015);
+
+    const co2Pre2015 = co2Data.filter(d => d.year <= 2015);
+    const co2Post2015 = co2Data.filter(d => d.year >= 2015);
+
     const eviLine = d3.line()
         .x(d => x(d.year))
         .y(d => yLeft(d.density));
 
-    // Visible EVI line
+    // EVI
     svgLineLocal.append("path")
-        .datum(grouped)
+        .datum(groupedPre2015)
         .attr("class", "evi-visible")
         .attr("fill", "none")
         .attr("stroke", "#47e664ff")
         .attr("stroke-width", 2)
         .attr("d", eviLine);
+
+    if (groupedPost2015.length > 0) {
+        svgLineLocal.append("path")
+            .datum(groupedPost2015)
+            .attr("class", "evi-visible-bold")
+            .attr("fill", "none")
+            .attr("stroke", "#47e664ff")
+            .attr("stroke-width", 6)
+            .attr("d", eviLine);
+    }
+
+    // Drought
+    const droughtLine = d3.line()
+        .x(d => x(d.year))
+        .y(d => yRight(d.drought));
+
+    svgLineLocal.append("path")
+        .datum(droughtPre2015)
+        .attr("class", "drought-line")
+        .attr("fill", "none")
+        .attr("stroke", "#ffcc00")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "4 2")
+        .style("visibility", "hidden")
+        .attr("d", droughtLine);
+
+    if (droughtPost2015.length > 0) {
+        svgLineLocal.append("path")
+            .datum(droughtPost2015)
+            .attr("class", "drought-line")
+            .attr("fill", "none")
+            .attr("stroke", "#ffcc00")
+            .attr("stroke-width", 6)
+            .attr("stroke-dasharray", "4 2")
+            .style("visibility", "hidden")
+            .attr("d", droughtLine);
+    }
+
+    // CO2
+    const co2Line = d3.line()
+        .x(d => x(d.year))
+        .y(d => yRightCO2(d.co2));
+
+    svgLineLocal.append("path")
+        .datum(co2Pre2015)
+        .attr("class", "co2-line")
+        .attr("fill", "none")
+        .attr("stroke", "#71ffd9ff")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "5 2")
+        .style("visibility", "hidden")
+        .attr("d", co2Line);
+
+    if (co2Post2015.length > 0) {
+        svgLineLocal.append("path")
+            .datum(co2Post2015)
+            .attr("class", "co2-line")
+            .attr("fill", "none")
+            .attr("stroke", "#71ffd9ff")
+            .attr("stroke-width", 6)
+            .attr("stroke-dasharray", "5 2")
+            .style("visibility", "hidden")
+            .attr("d", co2Line);
+    }
 
     const overlay = svgLineLocal.append("rect")
         .attr("x", 0)
@@ -579,34 +701,6 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("stroke", "white")
         .attr("stroke-width", 1)
         .attr("stroke-dasharray", "4 4")
-        .style("visibility", "hidden");
-
-    // Drought line
-    svgLineLocal.append("path")
-        .datum(droughtData)
-        .attr("class", "drought-line")
-        .attr("fill", "none")
-        .attr("stroke", "#ffcc00")
-        .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "4 2")
-        .attr("d", d3.line()
-            .x(d => x(d.year))
-            .y(d => yRight(d.drought))
-        )
-        .style("visibility", "hidden");
-
-    // CO2 line
-    svgLineLocal.append("path")
-        .datum(co2Data)
-        .attr("class", "co2-line")
-        .attr("fill", "none")
-        .attr("stroke", "#71ffd9ff")
-        .attr("stroke-width", 2)
-        .attr("stroke-dasharray", "5 2")
-        .attr("d", d3.line()
-            .x(d => x(d.year))
-            .y(d => yRightCO2(d.co2))
-        )
         .style("visibility", "hidden");
 
     // plot title
@@ -648,10 +742,10 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
     svgLineLocal.append("text").attr("x", 25).attr("y", 25).text("Vegetation Density").attr("fill", "white");
 
     svgLineLocal.append("circle").attr("cx", 10).attr("cy", 45).attr("r", 6).style("fill", "#ffcc00");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 50).text("Drought Index").attr("fill", "white");
+    svgLineLocal.append("text").attr("x", 25).attr("y", 50).text("Drought Index (U.S. Total)").attr("fill", "white");
 
     svgLineLocal.append("circle").attr("cx", 10).attr("cy", 70).attr("r", 6).style("fill", "#71ffd9ff");
-    svgLineLocal.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels").attr("fill", "white");
+    svgLineLocal.append("text").attr("x", 25).attr("y", 75).text("CO₂ Levels (U.S. Total)").attr("fill", "white");
 
     // ----- TOOLTIP -----
     const tooltip = d3.select(`#${tooltipId}`);

@@ -1,9 +1,11 @@
 body {
   margin: 0;
   padding: 0;
+  height: 100vh;
   font: 100%/1.5 system-ui;
   background: #212121;
   color: #e5e5e5;
+  overflow: hidden;
 }
 
 #slider-container {
@@ -83,14 +85,16 @@ body {
   height: 100%;
   top: 0;
   left: 0;
-  overflow-y: auto;        /* <-- Add this */
+  overflow-y: auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
 
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
-.page:first-child {
+.page:first-child, .page:nth-last-child(2) {
   display: flex !important;
   flex-direction: column;
   justify-content: center !important;
@@ -224,6 +228,13 @@ body {
 
 p.bottom {
   margin-bottom: 30px;
+}
+
+.linePlotFootnote {
+  font-size: 0.85em;
+  color: #cbcbcb;
+  margin-top: 4px;
+  font-style: italic;
 }
 
 #lineTooltip, #lineTooltipExtended{
