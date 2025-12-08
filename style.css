@@ -30,7 +30,6 @@ body {
 }
 
 #time-slider {
-    -webkit-appearance: none;
     width: 300px;
     height: 6px;
     border-radius: 3px;

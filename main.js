@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadData(){
+    // For info-box-container
     const percentChangeData = await d3.csv('data/5YearPercentChange_ByRegion.csv', (row) => ({
         startYear: +row.startYear,
         endYear: +row.endYear,
@@ -77,12 +78,14 @@ async function loadData(){
         stablPerc: +row.stable_percent
     }));
 
+    // For region masking on heatmap
     const stateRefData = await d3.csv('data/state_reference_data.csv', row => ({
         x: +row.x,
         y: +row.y,
         region: row.region || null  // store null if NaN
     }));
 
+    // For plotting heatmap
     const heatmapData = await d3.csv('data/heatmapDataWithState.csv', (row) => ({
         ...row,
         year: +row.year,
@@ -92,6 +95,7 @@ async function loadData(){
         state: row.state
     }));
 
+    // For line visualization
     const linePlotData = await d3.csv('data/heatmapDataWithState.csv', (row) =>({
         ...row,
         year: +row.year,
@@ -99,12 +103,14 @@ async function loadData(){
         state: row.state
     }));
 
+    // For line visualization
     const droughtData = await d3.csv('data/drought_fig-1.csv', (row) => ({
         ...row,
         year: +row.Year,
         drought: +row['Annual average']
     }));
 
+    // For line visualization
     const co2Data = await d3.csv('data/us-ghg-emissions_fig-1.csv', row => ({
         year: +row.Year,
         co2: +row['Carbon dioxide']
@@ -113,27 +119,13 @@ async function loadData(){
     return [percentChangeData, stateRefData, heatmapData, linePlotData, droughtData, co2Data];
 }
 
-function setupStateDropdown(data, selectId = "stateSelect") {
-    const select = document.getElementById(selectId);
-
-    const states = Array.from(new Set(data.map(d => d.state))).sort();
-
-    select.innerHTML = "";
-    select.append(new Option("United States", "US"));
-
-    states.forEach(state => {
-        select.append(new Option(state, state));
-    });
-}
-
+// Setting the canvas and resolution of heatmap
 const scale = 2;
-const width = 512 * scale;   // 1024
-const height = 256 * scale;  // 512
+const width = 512 * scale;
+const height = 256 * scale;
 
 const gridSizeX = 512;   // number of unique x pixels
 const gridSizeY = 256;   // number of unique y pixels
-
-const cellSize = 1;      // if you draw full resolution
 
 const cellWidth = width / gridSizeX;  // = 1 px
 const cellHeight = height / gridSizeY; // = 1 px
@@ -152,7 +144,6 @@ function drawLegendVertical(colors, startYear) {
     const rectHeight = 20;
     const spacing = 5;
 
-    // Numerical ranges for clarity
     const labels = [
         "Decrease > 20%",
         "Decrease 5-20%",
@@ -161,10 +152,12 @@ function drawLegendVertical(colors, startYear) {
         "Increase > 20%"
     ];
 
+    // Positioning to desired location
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - rectWidth - padding - 150}, ${height - (colors.length * (rectHeight + spacing)) - padding})`);
 
+    // More styling
     legend.selectAll("rect")
         .data(colors)
         .join("rect")
@@ -186,6 +179,7 @@ function drawLegendVertical(colors, startYear) {
         .attr("fill", "white")   
         .text(d => d);
     
+    // Text Styling
     const title = legend.append("text")
         .attr("class", "legend-title")
         .attr("x", 0)
@@ -194,12 +188,12 @@ function drawLegendVertical(colors, startYear) {
         .attr("font-weight", "bold")
         .attr("fill", "white");
 
-    // First line
+    // First line of legend title
     title.append("tspan")
         .attr("x", 0)
         .text("Vegetation Change");
 
-    // Second line (indented)
+    // Second line of legend title
     title.append("tspan")
         .attr("x", 0)
         .attr("dy", 14)
@@ -207,18 +201,18 @@ function drawLegendVertical(colors, startYear) {
 }
 
 function updateHeatMap(data, startYear) {
-    console.log("updateHeatMap called with startYear:", startYear);
-    console.log("Available years in data:", [...new Set(data.map(d => d.year))].sort());
-    
+    // Removing prior heatmap
     svg.selectAll("rect").remove();
+
     const startData = data.filter(d => d.year == startYear);
     const endData   = data.filter(d => d.year == startYear + 4);
     
+    // Maps coordinates to density
     const startMap = new Map(startData.map(d => [`${d.x},${d.y}`, d.value]));
     const endMap   = new Map(endData.map(d => [`${d.x},${d.y}`, d.value]));
-
     const allKeys = new Set([...startMap.keys(), ...endMap.keys()]);
 
+    // Process into heatmap-friendly data
     const stats = Array.from(allKeys).map(key => {
         const [x, y] = key.split(',').map(Number);
         const valStart = startMap.get(key);
@@ -227,6 +221,7 @@ function updateHeatMap(data, startYear) {
         let diff = NaN;
         let hasMissing = false;
 
+        // null or 133 represents non-US px
         if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
             hasMissing = true;
         } else {
@@ -269,15 +264,11 @@ function updateHeatMap(data, startYear) {
     drawLegendVertical(colors, startYear);
 }
 
+// Grabbing needed info from info from data
 function getPercByStartYear(data, startYear) {
     const filtered = data.filter(d => d.startYear === startYear);
 
     const transformed = filtered.map(d => {
-
-        console.log(
-            `Region ${d.region}: ${d.decPerc}% decrease`
-        );
-
         return {
             region: d.region,
             incPerc: d.incPerc,
@@ -290,20 +281,20 @@ function getPercByStartYear(data, startYear) {
 }
 
 function updateInfoBox(data, startYear, hoveredRegion = null) {
+    // Grabbing data + Deteremining which 
     const regionData = getPercByStartYear(data, startYear);
+    // Keep only the region that matches hoveredRegion once you 'hover the text'
     const displayData = hoveredRegion ? regionData.filter(d => d.region === hoveredRegion) : regionData;
 
-    // Select the container, not the ul
     const container = d3.select('#info-box-container');
     
     // Clear the entire container
     container.html('');
     
-    // Add title (outside the ul)
-    container.append('h3')
-        .text('Area (%) With Decrease in Vegetation');
+    // Add title
+    container.append('h3').text('Area (%) With Decrease in Vegetation');
     
-    // Add instruction (outside the ul)
+    // Add instruction
     container.append('div')
         .attr('class', 'instruction')
         .text('Hover over any boxes below to highlight it on the map');
@@ -318,6 +309,7 @@ function updateInfoBox(data, startYear, hoveredRegion = null) {
 
     const newItems = items.enter().append('li');
 
+
     newItems.merge(items)
         .html(d => `
             <div class="region-name">${d.region}</div>
@@ -331,21 +323,20 @@ function updateInfoBox(data, startYear, hoveredRegion = null) {
                     dimNonRegionPixels(d.region);
                 })
                 .on('mouseout', () => {
+                    // Reset the map overlay to show all regions normall
                     resetOverlay();
                 });
         });
 
     items.exit().remove();
 }
+
 // Function to dim non-region pixels using the overlay mask
 function dimNonRegionPixels(regionName) {
     if (!regionMaskData) {
         console.error('regionMaskData is undefined');
         return;
     }
-    
-    console.log(`Looking for region: ${regionName}`);
-    console.log(`Total regionMaskData records: ${regionMaskData.length}`);
     
     // First, make the entire map semi-transparent #212121
     overlayMask
@@ -361,7 +352,7 @@ function dimNonRegionPixels(regionName) {
     
     console.log(`Found ${nonRegionPixels.length} pixels to dim (non-${regionName})`);
     
-    // Remove any existing dimming rectangles
+    // Transparent-like any existing dimming px
     svg.selectAll(".dim-rect").remove();
     
     if (nonRegionPixels.length > 0) {
@@ -393,6 +384,21 @@ function resetOverlay() {
     
     // Remove region borders if they exist
     svg.selectAll(".region-border").remove();
+}
+
+// ############### Line Graphs ###############
+
+function setupStateDropdown(data, selectId = "stateSelect") {
+    const select = document.getElementById(selectId);
+
+    const states = Array.from(new Set(data.map(d => d.state))).sort();
+
+    select.innerHTML = "";
+    select.append(new Option("United States", "US"));
+
+    states.forEach(state => {
+        select.append(new Option(state, state));
+    });
 }
 
 var lineMargin = {top: 20, right: 40, bottom: 30, left: 40},
@@ -715,10 +721,11 @@ async function init() {
     const [percentChangeData, stateRefData, heatmapData, linePlotData, droughtData, co2Data] = await loadData();
     regionMaskData = stateRefData
 
-    let currentYear = 2000;
     // Initial heatmap
+    let currentYear = 2000;
     updateHeatMap(heatmapData, currentYear);
-    // Add a single overlay rect
+
+    // Prepping but applying an invisible map for later
     overlayMask = svg.append("rect")
     .attr("width", width)
     .attr("height", height)
@@ -727,6 +734,7 @@ async function init() {
     .attr("class", "overlay-mask")
     .style("z-index", "10");
 
+    // Update the mask visually if necessary
     updateInfoBox(percentChangeData, currentYear, null);
 
     const timeSlider = document.getElementById('time-slider');
@@ -740,7 +748,6 @@ async function init() {
         }
         else {
             currentYear = 2000 + timeFilter*5; // Update the current year
-            
             selectedTime.textContent = `${currentYear}-${currentYear + 4}`;
             
             // Update heatmap with current year
@@ -748,10 +755,9 @@ async function init() {
             updateInfoBox(percentChangeData, currentYear);
         }
     }
-
+    // Listen for sliding
     timeSlider.addEventListener('input', updateTimeDisplay);
     
-    // Set initial display
     timeSlider.value = "0"; // Show 2000-2004 initially
     updateTimeDisplay();
     
