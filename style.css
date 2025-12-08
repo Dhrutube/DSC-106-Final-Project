@@ -231,6 +231,13 @@ p.bottom {
   margin-bottom: 30px;
 }
 
+.linePlotFootnote {
+  font-size: 0.85em;
+  color: #cbcbcb;
+  margin-top: 4px;
+  font-style: italic;
+}
+
 #lineTooltip, #lineTooltipExtended{
     position: fixed;
     padding: 6px 10px;
