@@ -225,10 +225,14 @@ function updateHeatMap(data, startYear) {
         let hasMissing = false;
 
         // null or 133 represents non-US px
-        if (valStart === 133 || valEnd === 133 || valStart == null || valEnd == null) {
+        if (
+            valStart === 133 || valEnd === 133 ||
+            valStart == null || valEnd == null ||
+            valStart === 0
+        ) {
             hasMissing = true;
         } else {
-            diff = valEnd - valStart;
+            diff = (valEnd - valStart) / valStart;
         }
 
         return {
