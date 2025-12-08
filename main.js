@@ -616,7 +616,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
             .attr("class", "evi-visible-bold")
             .attr("fill", "none")
             .attr("stroke", "#47e664ff")
-            .attr("stroke-width", 6)
+            .attr("stroke-width", 8)
             .attr("d", eviLine);
     }
 
@@ -641,7 +641,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
             .attr("class", "drought-line")
             .attr("fill", "none")
             .attr("stroke", "#ffcc00")
-            .attr("stroke-width", 6)
+            .attr("stroke-width", 8)
             .attr("stroke-dasharray", "4 2")
             .style("visibility", "hidden")
             .attr("d", droughtLine);
@@ -668,7 +668,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
             .attr("class", "co2-line")
             .attr("fill", "none")
             .attr("stroke", "#71ffd9ff")
-            .attr("stroke-width", 6)
+            .attr("stroke-width", 8)
             .attr("stroke-dasharray", "6 6")
             .style("visibility", "hidden")
             .attr("d", co2Line);
