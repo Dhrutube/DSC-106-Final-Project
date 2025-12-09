@@ -152,6 +152,47 @@
 
       <div class="page">
         <h1>Write Up</h1>
+        <p>There are numerous ways of measuring the rate of climate change - rising sea levels, melting polar ice caps, slight temperature changes of regions, etc. Using these methods, it can take years if not decades for changes to be visible. Nevertheless, we found a much more responsive way of doing so - vegetation coverage. This is because plants are much more sensitive to factors such as carbon dioxide levels and temperature changes.
+        </p>
+        <p>Since vegetation varies on a season-to-season basis, any changes in current climate would cause the vegetation to alter as well because of its constantly changing nature. Vegetation peaks during the Summer, drops in the Fall, plateaus in the Winter and comes back in the Spring, right? Well, that’s the expected trend. We noticed that while the overall trend seems to be followed, there are differences in the vegetation coverage for the same season in the same region of the U.S in different years.
+        </p>
+        <p>Our main visualization was a heatmap choropleth map, which answers the question “where is the loss of vegetation if any?” We can consider the “heat” as the loss in vegetation and the “coolness” as the increase in vegetation. We chose yellow to show barrenness and green to show lushness, both are also color-blind-friendly. Now, we can clearly see that not only is there uniform loss in vegetation, there is noticeable loss in the central region of the United States, where key agriculture and farms are located. By adjusting the slider on top, we can see the change in vegetation over the span of four years. This was the hardest feature to implement as we have to ensure that 140,000 data points are accurately and efficiently depicted without crashing the website .
+        </p>
+        <p>Our next two visualizations are line plots. Since vegetation peaks in the Summer, it also shows the most variation. Hence, for these visualizations, we only used the summer months (June, July, August). These show not only the trend of vegetation density, but also the drought index and carbon dioxide levels. The first visualization focuses on 2000-2015 only, showing high variability. The second one focuses on 2000-2022, emphasizing how vegetation density has become more stable in the recent years. <br>
+
+          What we draw from this project is that we are on the right track ot stop climate change, but we are far from achieving it soon, and need to strictly keep at it.
+          </p>
+        <h2>Choropleth Heatmap</h2>
+        <h3>Color Scheme</h3>
+        <p><b>Intuitive Color Mapping: </b>Yellow → caution/decline (like autumn leaves drying), Green → growth/vitality (like healthy foliage). This leverages cultural color associations to make the data immediately understandable.
+        </p>
+        <p><b>Sequential Gradient: </b>The depth of color (e.g., light yellow to deep orange, light green to dark green) visually encodes the magnitude of change, allowing viewers to grasp severity at a glance.
+        </p>
+        <p><b>Accessibility: </b>The palette was tested for colorblind visibility.
+        </p>
+        <h3>The Heatmap & Slider</h3>
+        <p><b>Temporal Aggregation: </b>Using 5-year intervals smooths out annual anomalies (e.g., isolated droughts, fires) and reveals underlying climatic trends, reducing visual noise.
+        </p>
+        <p><b>Interaction Design: </b>The slider allows users to “scrub through time,” creating a narrative of change rather than a static comparison. This mimics a timeline, making the data feel dynamic and story-driven.</p>
+        <p><b>Geographic Fidelity: </b>The heatmap maintains state and regional boundaries without distorting the underlying map, ensuring geographic literacy while overlaying data.</p>
+        <p><b>Normalization by Percent Change: </b>Displaying relative change (rather than absolute density) standardizes comparison across regions with different baseline vegetation levels.
+        </p>
+        <h3>Info Box & Interaction</h3>
+        <p><b>Highlight-on-Hover: </b>Dimming non-relevant regions reduces cognitive load and focuses attention, mimicking a “spotlight” effect used in data dashboards and interactive maps.
+        </p>
+        <p><b>Urgency Through Typography: </b>Red text and the downward arrow (📉) emphasize loss, aligning with the narrative of climate urgency without relying on alarmist language.
+        </p>
+        <p><b>Regional Segmentation: </b>Breaking the U.S. into four macro-regions (Northeast, South, etc.) aligns with common climatic zones and simplifies interpretation for a general audience.
+        </p>
+
+        <h2>Line Plot</h2>
+        <h3>Color Scheme</h3>
+        <p><b>Color Scheme: </b>The color roughly matches what the line is showing:  green for vegetation density, yellow for drought, and blue for CO2</p>
+        <h3>Multi-line format</h3>
+        <p><b>Accessibility: </b>The lines also differ, either solid, dotted, or dashed, to make more distinction between the lines especially for viewers who might be colorblind.
+        </p>
+        <p><b>Clutter: </b>We forced only either the drought line or the CO2 line to be on the plot at once, not both. All three lines we are trying to look at have vastly different axis, so to make it less confusing we capped the line count to 2.</p>
+        <p><b>Emphasis: </b>For the second line plot we made the lines after 2015 significantly bolder to highlight the decreasing and more stable vegetation density. (We originally wanted to animate the points and line segments after 2015 fading in one by one but it proved too hard to implement before the submission deadline)</p>  
       </div>
     </div>
 
