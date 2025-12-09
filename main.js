@@ -773,7 +773,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("x", 30)
         .attr("y", 20)
         .attr("fill", "white")
-        .text("Drought Index (U.S. Total)");
+        .text("Drought Index (U.S. Annual Total)");
 
 
     // CO2 legend
@@ -792,7 +792,7 @@ containerId = 'lineViz', tooltipId = 'lineTooltip', droughtCheckboxId = 'toggleD
         .attr("x", 30)
         .attr("y", 20)
         .attr("fill", "white")
-        .text("CO₂ Levels (U.S. Total)");
+        .text("CO₂ Levels (U.S. Annual Total)");
 
 
     // ----- TOOLTIP -----
