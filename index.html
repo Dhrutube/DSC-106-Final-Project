@@ -1,79 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>AI Driven - Antarctic Heatmap</title>
+    <title>A Peek Into Vegetation Health and Climate Change</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Line Graph</title>
-    <script type="module" src="main.js"></script>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="main.js"></script>
   </head>
-
   <body>
-    <header>
-      <h1>
-        Circle of Life: Vegetation in the U.S. in 20 years
-      </h1>
+    <div id="slider-container">
+      <div class="page active">
+        <h1>Vegetation Density is a Sign of Climate Change</h1>
+        <h2>People normally look to temperature changes, glaciers, and ocean levels for signs of climate change <br>
+          but there is something else that reacts much faster to effects of climate change...
+        </h2>
+      </div>
 
-      <p><strong>Tony Bai</strong> — <em>zhbai@ucsd.edu</em></p>
-      <p><strong>Ricky Zhang</strong> — <em>riz004@ucsd.edu</em></p>
-      <p><strong>Dhruv Sehgal</strong> — <em>dsehgal@ucsd.edu</em></p>
-    </header>
+      <div class="page">
+          <h2>For each year, vegetation density changes with the season.</h2>
+          <p>Greenness peaks in the central region of the United States during the summer, drops in fall, and plateus in winter, before slowly reviving in spring. <br> 
+            At first this is what we expect, but the truth is complicated...</p>
+        <div class="quadrants-scroll">
+          <img src="images/winter map.png">
+          <img src="images/spring map.png">
+          <img src="images/summer map.png">
+          <img src="images/fall map.png">
+        </div>
+      </div>
 
-    <main>
+      <div class="page">
+        <h2>In a perfect world, the vegetation density would remain relatively stable every year <br>
+        and there would be minimal difference in vegetation density</h2>
+        <p>... but because climate change affects the seasons, there is a visible difference in vegetation density between years. But is this really the case? 
+          <br> <i>Scroll to see the degree of change over 25 years</i> </p>
+          
+        <header id="slider-container">
+          <div class="slider-wrapper">
+            <label for="time-slider" class="slider-label">Select Year Range:</label>
+            <input id="time-slider" type="range" min="0" max="4" value="0" step="1">
+            <span id="selected-Year-Range">2000-2004</span>
+          </div>
+        </header>
 
-        <section id="final-viz">
-            <h2>Greeness Over the Years in U.S.</h2>
-            <div class="controls">
-                <div class="item"><label for="startYear" >Start Year:</label></div>
-                <div class="item"><select id="startYear"></select></div>
-                <div class="item"><label for="endYear">End Year:</label></div>
-                <div class="item"><select id="endYear"></select></div>
-                <div class="item"><button id="updateButton">Update Line PLot</button></div>
-              </div>
-              <br>
-              <div class="linePlotDisplay">
-                <div id="viz"></div>
-                <div id="legend"></div>
-              </div>
+        <div class="heatmapDisplay">
+          <div id="viz"></div>
+          <div id="legend"></div>
+        </div>
 
-          <figure>
-            <figcaption>
-              Select any two years such that the range between them is 5 years. Each colored line corresponds to a year, showing the trend of vegetation over the year in the U.S. overall. The x-axis represents the months, and the y-axis represents the density of current vegetation over the U.S.
-            </figcaption>
-          </figure>
-        </section>
-      
+        <div id="info-box-container">
+          <ul id="info-box"><h3>Area (%) With Decrease in Vegetation</h3><i>Hover over the text to see region displayed above</i></ul>
+        </div>
 
-      <section>
+      </div>
 
-        <h2>What have we done so far?</h2>
-        <ol>
-          <li>We chose NASA MODIS as our dataset and have finished most of our EDA.</li>
-          <li>We have compiled the data we are planning to use into .csv files, pulled from the .xml file acquired from the dataset.</li>
-          <li>We have started working on creating appropriate sized bins of vegetation density for the final visualization on a map and ways to plot it.</li>
-          <li>We are working on making our final presentation a more 'story-telling' format, experimenting with multiple map visualizations, etc. We want to show the trend of each season over the years.</li>
-          <li>We experimented with a slideshow format.</li>
-        </ol>
+      <div class="page">
+        <h2>During the summer months, the vegetation density has been volatile year by year</h2>
+        <p>because of droughts and elevated levels of CO2. <br>
+        </p>
+        <div class="stateControls">
+            <label for="stateSelect">Select a State:</label>
+            <select id="stateSelect"></select>
+        </div>
+        <div class="linePlotDisplay">
+          <div id="lineViz"></div>
+          <div id="lineTooltip"></div>
+          <div id="linePlotCitation" class="linePlotCitation">
+            Data sources: 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-us-greenhouse-gas-emissions/index.html" target="_blank">
+              EPA, U.S. Greenhouse Gas Emissions
+            </a>, 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-drought/index.html" target="_blank">
+              EPA, Drought
+            </a>
+          </div>
+          <p class="linePlotFootnote"><i>Note: For the drought index, positive numbers mean drier conditions and negative numbers mean wetter conditions.</i></p>
+        </div>
+        <div class="linePlotLabel">
+          <label>
+            <input type="checkbox" id="toggleDrought"> Show Drought Line
+          </label>
+          <label>
+            <input type="checkbox" id="toggleCO2"> Show CO₂ Line
+          </label>
+        </div>
+        <p>The reason the vegetation density is this volatile is due to a combination of droughts and elevated levels of CO2. <br>
+          Droughts is obvious, less water means plants will slowly start wilt and eventually die, but CO2 is not as obvious as you may think. <br>
+          CO2 is a necessary component to photosynthesis, meaning more CO2 would lead to more photosynthesis and more plants right? <br>
+          Not quite. Although more CO2 does generally have a positive effect on plants, plants are limited by other nutrients they have to compete for. <br>
+          It is also a greenhouse gas, which also feeds into increased temperatures and droughts, leading to volatile vegetation density.
+        </p>
+        <p class="bottom">
+          …  
+          Additional sources:  
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12121383/" target="_blank">Atmospheric CO₂ Concentration and Other Limiting Factors in Plant Growth (PMC)</a>, <br>
+          <a href="https://www.nasa.gov/technology/nasa-study-rising-carbon-dioxide-levels-will-help-and-hurt-crops/" target="_blank">NASA: Rising Carbon Dioxide Levels Will Help and Hurt Crops</a>
+        </p>
+      </div>
 
-      </section>
+      <div class="page">
+        <h2>However, in more recent years, vegetation density has slightly decreased and become more stable</h2>
+        <p>in most states thanks to climate mitigation efforts and more incentives to invest in more renewable energy resources.</p>
+        <div class="stateControls">
+            <label for="stateSelectExtended">Select a State:</label>
+            <select id="stateSelectExtended"></select>
+        </div>
+        <div class="linePlotDisplay">
+          <div id="lineVizExtended"></div>
+          <div id="lineTooltipExtended"></div>
+          <div id="linePlotCitation" class="linePlotCitation">
+            Data sources: 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-us-greenhouse-gas-emissions/index.html" target="_blank">
+              EPA, U.S. Greenhouse Gas Emissions
+            </a>, 
+            <a href="https://19january2025snapshot.epa.gov/climate-indicators/climate-change-indicators-drought/index.html" target="_blank">
+              EPA, Drought
+            </a>
+          </div>
+          <p class="linePlotFootnote"><i>Note: For the drought index, positive numbers mean drier conditions and negative numbers mean wetter conditions.</i></p>
+        </div>
+        <div class="linePlotLabel">
+          <label>
+            <input type="checkbox" id="toggleDroughtExtended"> Show Drought Line
+          </label>
+          <label>
+            <input type="checkbox" id="toggleCO2Extended"> Show CO₂ Line
+          </label>
+        </div>
+        <p>Thanks to incentives such as the Consolidated Appropriations Act of 2016, Congress gave the renewable energy industry <br>
+        substantial Investment Tax Credit (ITC) and Production Tax Credit (PTC) for the next 5 years, both reducing the financial barrier <br>
+        and promoting sustainable energy sources. The Act helped reduce CO2 emissions by a substantial amount, but it isn't quite enough. <br>
+        According to the UN Environment Programme's Emissions Gap Report 2025, global temperatures will likely exceed <br>
+        1.5°C above pre-industrial levels within the next decade. </p>
+        <p class="bottom">
+          …  
+          Additional sources:  
+          <a href="https://www.unep.org/news-and-stories/story/world-likely-exceed-key-global-warming-target-soon-now-what" target="_blank">The world is likely to exceed a key global warming target soon. Now what?</a>,  <br>
+          <a href="https://www.dsireinsight.com/blog/2024/10/11/the-past-present-and-future-of-federal-tax-credits-for-renewable-energy" target="_blank">The Past, Present, and Future of Federal Tax Credits for Renewable Energy</a>
+        </p>
+      </div>
 
-      <section>
+      <div class="page">
+        <h1>Is it possible to keep temperature increase below 1.5°C? Yes, but...</h1>
+        <h2>We need to continue pushing for more renewable energy production and continue to phase out fossil fuel. <br>
+          Although the chances of achieving it is thin, it is possible if we can convince the world leaders to continue investing <br>
+          in more renewable energy production, especially for the countries that are not on track to achieving their <br>
+          climate pledge for the Paris Agreement.</h2>
+          <br> <br>
+        <h2>In the decade since the Paris Agreement was signed we have significally slowed our CO2 emissions, <br>
+          now let's work towards net neutral.</h2>
+      </div>
 
-        <h2>What will be the most challenging of your project to design and why?</h2>
-        <ol>
-          <li>As of right now, we believe the most challenging part to design would be a good story-telling format.</li>
-          <li>While we are currently experimenting on ways to do this, but since there are so many options, it is tough to decide on a final one.</li>
-          <li>So far, we have experimented with just one map combined with a line plot, only a map, a slideshow format like the gun deaths story-telling visualization covered in lecture, and even multiple maps for each year, each map showing the vegetation for each season.</li>
-          <li>For the visualization where we would show multiple maps for each season, experimenting with a slideshow format is technically difficult. Implementing a next page and also a previous page to update the visualization accordinly is turning out to be a bit challenging.</li>
-          <li>Coming up with an 'and-therfore' is okay, but coming up with a 'but' part of the story is somewhat difficult.</li>
-          <li>Also, while for now, we are only showing five years, we might look into methods that can show more than 5 years yet still not be cluttered.</li>
-        </ol>
+      <div class="page">
+        <h1>Write Up</h1>
+        <p>There are numerous ways of measuring the rate of climate change - rising sea levels, melting polar ice caps, slight temperature changes of regions, etc. Using these methods, it can take years if not decades for changes to be visible. Nevertheless, we found a much more responsive way of doing so - vegetation coverage. This is because plants are much more sensitive to factors such as carbon dioxide levels and temperature changes.
+        </p>
+        <p>Since vegetation varies on a season-to-season basis, any changes in current climate would cause the vegetation to alter as well because of its constantly changing nature. Vegetation peaks during the Summer, drops in the Fall, plateaus in the Winter and comes back in the Spring, right? Well, that’s the expected trend. We noticed that while the overall trend seems to be followed, there are differences in the vegetation coverage for the same season in the same region of the U.S in different years.
+        </p>
+        <p>Our main visualization was a heatmap choropleth map, which answers the question “where is the loss of vegetation if any?” We can consider the “heat” as the loss in vegetation and the “coolness” as the increase in vegetation. We chose yellow to show barrenness and green to show lushness, both are also color-blind-friendly. Now, we can clearly see that not only is there uniform loss in vegetation, there is noticeable loss in the central region of the United States, where key agriculture and farms are located. By adjusting the slider on top, we can see the change in vegetation over the span of four years. This was the hardest feature to implement as we have to ensure that 140,000 data points are accurately and efficiently depicted without crashing the website .
+        </p>
+        <p>Our next two visualizations are line plots. Since vegetation peaks in the Summer, it also shows the most variation. Hence, for these visualizations, we only used the summer months (June, July, August). These show not only the trend of vegetation density, but also the drought index and carbon dioxide levels. The first visualization focuses on 2000-2015 only, showing high variability. The second one focuses on 2000-2022, emphasizing how vegetation density has become more stable in the recent years. <br>
 
-      </section>
+          What we draw from this project is that we are on the right track ot stop climate change, but we are far from achieving it soon, and need to strictly keep at it.
+          </p>
+        <h2>Choropleth Heatmap</h2>
+        <h3>Color Scheme</h3>
+        <p><b>Intuitive Color Mapping: </b>Yellow → caution/decline (like autumn leaves drying), Green → growth/vitality (like healthy foliage). This leverages cultural color associations to make the data immediately understandable.
+        </p>
+        <p><b>Sequential Gradient: </b>The depth of color (e.g., light yellow to deep orange, light green to dark green) visually encodes the magnitude of change, allowing viewers to grasp severity at a glance.
+        </p>
+        <p><b>Accessibility: </b>The palette was tested for colorblind visibility.
+        </p>
+        <h3>The Heatmap & Slider</h3>
+        <p><b>Temporal Aggregation: </b>Using 5-year intervals smooths out annual anomalies (e.g., isolated droughts, fires) and reveals underlying climatic trends, reducing visual noise.
+        </p>
+        <p><b>Interaction Design: </b>The slider allows users to “scrub through time,” creating a narrative of change rather than a static comparison. This mimics a timeline, making the data feel dynamic and story-driven.</p>
+        <p><b>Geographic Fidelity: </b>The heatmap maintains state and regional boundaries without distorting the underlying map, ensuring geographic literacy while overlaying data.</p>
+        <p><b>Normalization by Percent Change: </b>Displaying relative change (rather than absolute density) standardizes comparison across regions with different baseline vegetation levels.
+        </p>
+        <h3>Info Box & Interaction</h3>
+        <p><b>Highlight-on-Hover: </b>Dimming non-relevant regions reduces cognitive load and focuses attention, mimicking a “spotlight” effect used in data dashboards and interactive maps.
+        </p>
+        <p><b>Urgency Through Typography: </b>Red text and the downward arrow (📉) emphasize loss, aligning with the narrative of climate urgency without relying on alarmist language.
+        </p>
+        <p><b>Regional Segmentation: </b>Breaking the U.S. into four macro-regions (Northeast, South, etc.) aligns with common climatic zones and simplifies interpretation for a general audience.
+        </p>
 
-    </main>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"c822b88e119346678db149ed7b7721c9","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+        <h2>Line Plot</h2>
+        <h3>Color Scheme</h3>
+        <p><b>Color Scheme: </b>The color roughly matches what the line is showing:  green for vegetation density, yellow for drought, and blue for CO2</p>
+        <h3>Multi-line format</h3>
+        <p><b>Accessibility: </b>The lines also differ, either solid, dotted, or dashed, to make more distinction between the lines especially for viewers who might be colorblind.
+        </p>
+        <p><b>Clutter: </b>We forced only either the drought line or the CO2 line to be on the plot at once, not both. All three lines we are trying to look at have vastly different axis, so to make it less confusing we capped the line count to 2.</p>
+        <p><b>Emphasis: </b>For the second line plot we made the lines after 2015 significantly bolder to highlight the decreasing and more stable vegetation density. (We originally wanted to animate the points and line segments after 2015 fading in one by one but it proved too hard to implement before the submission deadline)</p>  
+      </div>
+    </div>
+
+    <!-- Arrows -->
+    <div id="left-arrow">&#10094;</div>
+    <div id="right-arrow">&#10095;</div>
+  </body>
 </html>

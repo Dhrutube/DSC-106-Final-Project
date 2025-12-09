@@ -1,156 +1,277 @@
-:root {
-  --color-neutral-95: hsl(220 10% 95%);
-  --color-neutral-90: hsl(220 10% 90%);
-  --color-neutral-80: hsl(220 10% 80%);
-  --color-neutral-70: hsl(220 10% 70%);
-  --color-neutral-60: hsl(220 10% 60%);
-  --color-neutral-50: hsl(220 10% 50%);
-  --color-neutral-40: hsl(220 10% 40%);
-  --color-neutral-30: hsl(220 10% 30%);
-  --color-neutral-20: hsl(220 10% 20%);
-  --color-neutral-10: hsl(220 10% 10%);
-}
-
-html {
-  font: 100%/1.5 system-ui;
-  counter-reset: figure;
-  background: var(--color-neutral-95);
-  max-width: min(75vw, 80em);
-  margin: 0 auto;
-}
+/* 
+General text CSS 
+*/
 
 body {
-  font-family: "arial";
-  min-width: fit-content;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  height: 100vh;
+  font: 100%/1.5 system-ui;
+  background: #212121;
+  color: #e5e5e5;
+  overflow: hidden;
+}
+
+p.bottom {
+  margin-bottom: 30px;
+}
+
+/* 
+Page CSS 
+*/
+
+#slider-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
   box-sizing: border-box;
+
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
-/* Headings */
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  line-height: 1.1;
-  font-weight: 600;
-  text-wrap: balance;
-}
-
-h1,
-h2 {
-  border-bottom: 1px solid var(--color-neutral-80);
-  padding-bottom: 0.2em;
-  font-family: "Lucida Console";
-}
-
-h1 {
-  margin-block: 1em 0.5rem;
-  font-size: clamp(2.5em, 150% + 2vh + 2vw, 10vmin);
-  font-weight: 800;
-
-  small {
-    display: block;
-    width: fit-content;
-    padding: 0.2em 0.5em;
-    margin-inline: auto;
-    color: white;
-    background: var(--color-neutral-40);
-    font-size: 40%;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-}
-
-h2 {
-  font-size: 180%;
-  color: var(--color-neutral-30);
-}
-
-h3 {
-  font-size: 130%;
-}
-
-/* Lists */
-
-ul,
-ol {
-  padding-inline-start: 2em;
-}
-
-li {
-  &::marker {
-    color: var(--color-neutral-40);
-  }
-
-  + li {
-    margin-top: 0.2em;
-  }
-}
-
-/* Sectioning elements */
-
-header {
-  padding-block: 1em;
+.page:first-child, .page:nth-last-child(2) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center !important;
+  align-items: center !important;
   text-align: center;
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden;       
+
+  h1 {
+    font-size: 45px;
+  }
 }
 
-main {
+.page:not(:first-child) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;  
+  padding-top: 10px;
+  height: 100%; 
+
+  h2 {
+    margin-bottom: 0;
+  }
+}
+
+.page.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Wipe overlay */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: white;
-  color: var(--color-neutral-20);
-  border-radius: 1rem;
-  padding: 0.1rem 2rem;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.5s ease-in-out;
+  pointer-events: none;
 }
 
-/* Figures */
+/* Trigger wipe-out animation */
+.page.wipe-out::after {
+  clip-path: inset(0 0 0 0); 
+}
 
-figure {
-  margin: 1em 0;
+/* 
+Arrows 
+*/
+
+#left-arrow, #right-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  cursor: pointer;
+  color: #444;
+  padding: 10px;
+  user-select: none;
+  z-index: 1000;
+}
+#left-arrow { left: 20px; }
+#right-arrow { right: 20px; }
+#left-arrow:hover, #right-arrow:hover { color: black; }
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/*
+Map images
+*/
+
+.quadrants-scroll {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 70%;
+  gap: 10px;
+  overflow: visible;
+  margin-bottom: 50px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  img.fade-in {
+    opacity: 1;
+  }
+}
+
+/* ================================= Vegetation Density Line Viz Dropdown */
+
+.stateControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0 25px 0;
+}
+
+.stateControls label {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.stateControls select {
   padding: 0.5rem;
-  margin-inline: -0.5em;
-  border: 1px solid var(--color-neutral-80);
-  box-shadow: 0 0.1em 0.2em var(--color-neutral-95);
-  text-align: center;
+  border: 1px solid oklch(80% 3% 200);
   background: white;
-
-  > figcaption {
-    font: 500 75% var(--font-sans);
-    background: var(--color-neutral-95);
-    padding: 0.5rem;
-    margin: -0.5rem;
-    counter-increment: figure;
-    text-align: left;
-
-    &::before {
-      content: 'Figure ' counter(figure) ': ';
-      font-weight: bold;
-      color: var(--color-neutral-40);
-    }
-
-    a:not(:hover, :focus, :active) {
-      color: inherit;
-      text-decoration: underline;
-      text-decoration-color: color-mix(
-        in lab,
-        currentColor,
-        transparent 70%
-      );
-    }
-  }
+  color: black;
+  border-radius: 6px;
+  font-size: 15px;
+  min-width: 180px;
+  cursor: pointer;
 }
 
-.img-wrap-box {
-  clear:left; 
-  padding: 0.5em;
+/*
+Line plot
+*/
+
+.linePlotCitation {
+  font-size: 12px;
+  color: #ccc;
+  text-align: center;
+  margin-top: 5px;
 }
 
-.img-wrap {
-  float: left;
-  max-width: 30vw;
-  margin-right: 2em;
+.linePlotCitation a {
+  color: #47e664ff;
+  text-decoration: none;
+}
+
+.linePlotCitation a:hover {
+  text-decoration: underline;
+}
+
+.linePlotFootnote {
+  font-size: 0.85em;
+  color: #cbcbcb;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+#lineTooltip, #lineTooltipExtended{
+    position: fixed;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.linePlotDisplay {
+  margin-bottom: 20px;
+}
+
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #2c2c2c;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.slider-label {
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 140px;
+}
+
+#time-slider {
+    width: 300px;
+    height: 6px;
+    border-radius: 3px;
+    background: #555;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#time-slider:hover {
+    background: #777;
+}
+
+#time-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #47e664;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#time-slider::-webkit-slider-thumb:hover {
+    background: #3ebc57;
+    transform: scale(1.2);
+}
+
+#time-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #47e664;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#selected-Year-Range {
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 90px;
+    text-align: center;
 }
 
 .controls {
@@ -159,23 +280,18 @@ figure {
   margin-bottom: 1rem;
   padding: 0.5rem 0;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   width: 100%;
 }
 
 .controls .item {
   display: flex;
-  align-items: center;
-  white-space: nowrap;
-  color: gray
-}
-
-.controls label {
-  font-weight: bold;
-  margin: 0;
-  padding-right: 0.5rem;
-  color: gray;
-  font-size: 0.95em;
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;  
+  padding-top: 10px;
+  height: 100%; 
 }
 
 .controls select {
@@ -195,73 +311,95 @@ figure {
   cursor: pointer;
 }
 
+/* ================================= Viz Margin Adjustment  */
 .heatmapDisplay {
-    display: grid; 
-    grid-template-columns: 512px auto;
-    align-items: start;
-    gap: 20px;
-    width: max-content;
-}
-
-.heatmapDisplay #viz{
-  grid-column: 1;
-  grid-row: auto;
-}
-
-.heatmapDisplay #legend{
-  grid-column: 2;
-  grid-row: auto;
-  margin-left: 30px;   /* moves legend to the right */
-  margin-top: 120px;    /* moves legend downward */
-}
-
-#brushStats {
-  grid-column: 2;
-  grid-row: 2;
-  padding: 1em 1.2em;
-  font-family: sans-serif;
-  font-size: 14px;
-  color: #333;
-  height: fit-content;
-  margin-top: 1em;
-}
-
-#brushStats h3 {
-  font-size: 15px;
-  margin: 0 0 0.5em 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.3em;
-}
-
-#brushStats dl {
-  margin: 0;
-}
-
-#brushStats dt {
-  font-weight: 600;
-  margin-top: 6px;
-}
-
-#brushStats dd {
-  margin: 0 0 4px 0;
+  margin-bottom: 10px;
 }
 
 .linePlotDisplay {
-  display: grid;
-  grid-template-columns: auto max-content;
-  align-items: start;
-  gap: 30px;   /* increase spacing for clarity */
-  width: max-content;
+  margin-bottom: 20px;
 }
 
-.linePlotDisplay #viz{
-grid-column: 1;
-grid-row: auto;
+/* ================================= Heatmap info box  */
+/* Info Box Container */
+#info-box-container {
+    background-color: rgba(33, 33, 33, 0.8);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-.linePlotDisplay #legend{
-grid-column: 2;
-grid-row: auto;
-/* margin-left: 30px;
-margin-top: 120px; */
+/* Region List */
+#info-box {
+    list-style: none;
+    padding: 0;
+    margin: 1em 0em 0em 0em;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+#info-box li {
+    display: flex;
+    justify-content: space-between; /* Name left, value right */
+    align-items: center;
+    padding: 12px 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    flex: 1;
+    min-height: 45px;
+}
+
+#info-box li .region-name {
+    font-weight: bold;
+    color: #fff;
+    font-size: 14px;
+    margin-right: 15px; /* Space between name and value */
+}
+
+#info-box li .region-value {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+/* ================================= Overlay masking when hover  */
+.region-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    pointer-events: all;
+}
+
+#info-box .region-list li:hover {
+    background-color: rgba(33, 33, 33, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* ================================= More heatmap info box adjustment  */
+#info-box h3 {
+    margin: 0 0 12px 0;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 10px;
+}
+
+#info-box {
+    padding: 24px 32px;
+    border-radius: 12px;
+    color: #fff;
+    width: auto;
+    max-width: 100%;
 }
