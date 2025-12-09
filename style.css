@@ -53,7 +53,7 @@ Page CSS
   overflow: hidden;       
 
   h1 {
-    font-size: 45px;
+    font-size: 40px;
   }
 }
 
@@ -67,6 +67,22 @@ Page CSS
 
   h2 {
     margin-bottom: 0;
+  }
+}
+
+.page:last-child {
+  align-items: flex-start !important;
+  text-align: left !important;
+  justify-content: left !important;
+  padding-left: 80px;
+  padding-right: 80px;
+  
+  h1 {
+    width: 100%;
+    text-align: center !important;
+  }
+  h2 {
+    margin-bottom: 20px;
   }
 }
 
